@@ -1,0 +1,43 @@
+{
+  "type": "module",
+  "name": "api-ecommerce",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "codegen": "graphql-codegen --config .graphqlrc.ts",
+    "postinstall": "pnpm codegen",
+    "dev": "tsx watch src/server.ts",
+    "lint": "eslint --fix --dir src",
+    "format": "prettier --write .",
+    "generate-migrations": "drizzle-kit generate:sqlite",
+    "migrate": "tsx src/database/migrate.ts",
+    "seed": "tsx src/database/seed.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eddeee888/gcg-typescript-resolver-files": "^0.7.2",
+    "@faker-js/faker": "^8.4.1",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "drizzle-kit": "^0.20.14",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "graphql": "^16.8.1",
+    "prettier": "^3.2.5",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.10.0",
+    "@libsql/client": "^0.4.3",
+    "@types/better-sqlite3": "^7.6.9",
+    "dotenv": "^16.4.2",
+    "drizzle-orm": "^0.29.3",
+    "graphql-scalars": "^1.22.4"
+  }
+}
