@@ -1,9 +1,6 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import Database from "better-sqlite3";
 
-const betterSqlite = new Database(process.env.DATABASE_URL);
-const db = drizzle(betterSqlite);
+import { db, sqlite } from "./client.js";
 
 migrate(db, { migrationsFolder: "drizzle" });
-betterSqlite.close();
+sqlite.close();

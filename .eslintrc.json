@@ -72,15 +72,17 @@
         "name": "next/router",
         "message": "Please use next/navigation instead."
       }
-    ]
+    ],
+
+    "import/no-unresolved": "off"
   },
   "overrides": [
     {
-      "files": ["src/app/**/*.ts?(x)", "middleware.ts"],
+      "files": ["src/plugins/graphql/generated.ts"],
       "rules": {
-        "import/no-default-export": "off"
+        "@typescript-eslint/no-explicit-any": "off"
       }
     }
   ],
-  "ignorePatterns": ["*.js", "*.jsx"]
+  "ignorePatterns": ["*.js", "src/plugins/graphql/generated.ts"]
 }

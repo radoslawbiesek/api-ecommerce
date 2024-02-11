@@ -1,10 +1,14 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "@/database/client";
-import { products } from "@/database/schema";
+import { type Db } from "database/client.js";
+import { products } from "database/schema.js";
 
-export async function findById(id: number) {
-  const results = await db.select().from(products).where(eq(products.id, id));
+export class ProductsRepository {
+  constructor(private readonly db: Db) {}
 
-  return results[0];
+  async findById(id: number): Promise<typeof products.$inferSelect | undefined> {
+    const results = await this.db.select().from(products).where(eq(products.id, id));
+
+    return results[0];
+  }
 }

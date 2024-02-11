@@ -1,12 +1,8 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
 import { faker } from "@faker-js/faker";
 import "dotenv/config";
 
-import { products } from "@/database/schema";
-
-const betterSqlite = new Database(process.env.DATABASE_URL);
-const db = drizzle(betterSqlite);
+import { products } from "./schema.js";
+import { db, sqlite } from "./client.js";
 
 for (let i = 0; i < 100; i++) {
   const name = faker.commerce.productName();
@@ -24,4 +20,4 @@ for (let i = 0; i < 100; i++) {
   console.log(`Created product (id: ${id}, name: ${name})`);
 }
 
-betterSqlite.close();
+sqlite.close();

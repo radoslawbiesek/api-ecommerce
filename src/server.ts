@@ -1,19 +1,9 @@
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
+import Fastify from "fastify";
 import "dotenv/config";
 
-import { typeDefs } from "@/graphql/typeDefs.generated.js";
-import { resolvers } from "@/graphql/resolvers.generated.js";
+const app = Fastify({ logger: { level: "debug" } });
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
+await app.register(import("plugins/database/index.js"));
+await app.register(import("plugins/graphql/index.js"));
 
-const { url } = await startStandaloneServer(server, {
-  listen: {
-    port: 4000,
-  },
-});
-
-console.log(`Server is listening at: ${url}`);
+await app.listen({ port: 3000 });
