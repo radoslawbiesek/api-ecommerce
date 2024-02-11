@@ -19,17 +19,6 @@
     "import/no-mutable-exports": "error",
 
     "import/no-cycle": "error",
-    "import/no-default-export": "error",
-
-    // allow {} even though it's unsafe but comes handy
-    "@typescript-eslint/ban-types": [
-      "error",
-      {
-        "types": {
-          "{}": false
-        }
-      }
-    ],
 
     "@typescript-eslint/consistent-type-imports": [
       "error",
@@ -65,14 +54,6 @@
     "@typescript-eslint/restrict-template-expressions": ["error", { "allowNumber": true, "allowBoolean": true }],
 
     "@typescript-eslint/no-misused-promises": ["error", { "checksVoidReturn": false }],
-
-    "no-restricted-imports": [
-      "error",
-      {
-        "name": "next/router",
-        "message": "Please use next/navigation instead."
-      }
-    ],
 
     "import/no-unresolved": "off"
   },
