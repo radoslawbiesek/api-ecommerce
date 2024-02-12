@@ -14,3 +14,6 @@ export const products = sqliteTable("products", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 });
+
+export type Product = typeof products.$inferSelect;
+export type NewProduct = typeof products.$inferInsert;

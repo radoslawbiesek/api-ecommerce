@@ -16,9 +16,7 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   args: TArgs,
   context: TContext,
   info: GraphQLResolveInfo,
-) =>
-  | Promise<import("mercurius-codegen").DeepPartial<TResult>>
-  | import("mercurius-codegen").DeepPartial<TResult>;
+) => Promise<import("mercurius-codegen").DeepPartial<TResult>> | import("mercurius-codegen").DeepPartial<TResult>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
   [P in K]-?: NonNullable<T[P]>;
 };
@@ -73,25 +71,9 @@ export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
   info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>;
 
-export interface SubscriptionSubscriberObject<
-  TResult,
-  TKey extends string,
-  TParent,
-  TContext,
-  TArgs,
-> {
-  subscribe: SubscriptionSubscribeFn<
-    { [key in TKey]: TResult },
-    TParent,
-    TContext,
-    TArgs
-  >;
-  resolve?: SubscriptionResolveFn<
-    TResult,
-    { [key in TKey]: TResult },
-    TContext,
-    TArgs
-  >;
+export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
+  subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
+  resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
 }
 
 export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
@@ -99,26 +81,12 @@ export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
   resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
 }
 
-export type SubscriptionObject<
-  TResult,
-  TKey extends string,
-  TParent,
-  TContext,
-  TArgs,
-> =
+export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
   | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
   | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
 
-export type SubscriptionResolver<
-  TResult,
-  TKey extends string,
-  TParent = {},
-  TContext = {},
-  TArgs = {},
-> =
-  | ((
-      ...args: any[]
-    ) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
   | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
@@ -135,12 +103,7 @@ export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
 
 export type NextResolverFn<T> = () => Promise<T>;
 
-export type DirectiveResolverFn<
-  TResult = {},
-  TParent = {},
-  TContext = {},
-  TArgs = {},
-> = (
+export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
   next: NextResolverFn<TResult>,
   parent: TParent,
   args: TArgs,
@@ -168,21 +131,14 @@ export type ResolversParentTypes = {
 
 export type QueryResolvers<
   ContextType = MercuriusContext,
-  ParentType extends
-    ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
+  ParentType extends ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
 > = {
-  product?: Resolver<
-    Maybe<ResolversTypes["Product"]>,
-    ParentType,
-    ContextType,
-    RequireFields<QueryproductArgs, "id">
-  >;
+  product?: Resolver<Maybe<ResolversTypes["Product"]>, ParentType, ContextType, RequireFields<QueryproductArgs, "id">>;
 };
 
 export type ProductResolvers<
   ContextType = MercuriusContext,
-  ParentType extends
-    ResolversParentTypes["Product"] = ResolversParentTypes["Product"],
+  ParentType extends ResolversParentTypes["Product"] = ResolversParentTypes["Product"],
 > = {
   id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
@@ -228,7 +184,6 @@ export interface Loaders<
   };
 }
 declare module "mercurius" {
-  interface IResolvers
-    extends Resolvers<import("mercurius").MercuriusContext> {}
+  interface IResolvers extends Resolvers<import("mercurius").MercuriusContext> {}
   interface MercuriusLoaders extends Loaders {}
 }
