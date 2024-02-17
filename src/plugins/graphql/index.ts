@@ -17,12 +17,19 @@ const schema = gql`
     description: String!
     price: Int!
   }
+
+  type Category {
+    id: Int!
+    name: String!
+    slug: String!
+  }
 `;
 
 const resolvers: IResolvers = {
   Query: {
     product: async function product(parent, args, context) {
       const productsRepository = new ProductsRepository(context.app.db);
+
       return productsRepository.findById(args.id);
     },
   },

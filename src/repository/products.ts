@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { type Db } from "database/client.js";
-import { type NewProduct, type Product, products } from "database/schema.js";
+import { categories, Category, type NewProduct, type Product, products } from "database/schema.js";
 
 export class ProductsRepository {
   constructor(private readonly db: Db) {}
@@ -20,6 +20,10 @@ export class ProductsRepository {
     const result = await this.db.select().from(products).where(eq(products.id, id));
 
     return result[0];
+  }
+
+  async findCategories(id: number): Promise<Category[]> {
+    return this.db.select().from(categories).where(eq(categories.id, id));
   }
 
   async update(id: number, product: NewProduct): Promise<Product> {
