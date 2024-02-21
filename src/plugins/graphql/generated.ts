@@ -48,6 +48,13 @@ export type Product = {
   price: Scalars["Int"];
 };
 
+export type Category = {
+  __typename?: "Category";
+  id: Scalars["Int"];
+  name: Scalars["String"];
+  slug: Scalars["String"];
+};
+
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
@@ -117,6 +124,7 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars["Int"]>;
   Product: ResolverTypeWrapper<Product>;
   String: ResolverTypeWrapper<Scalars["String"]>;
+  Category: ResolverTypeWrapper<Category>;
   Boolean: ResolverTypeWrapper<Scalars["Boolean"]>;
 };
 
@@ -126,6 +134,7 @@ export type ResolversParentTypes = {
   Int: Scalars["Int"];
   Product: Product;
   String: Scalars["String"];
+  Category: Category;
   Boolean: Scalars["Boolean"];
 };
 
@@ -148,9 +157,20 @@ export type ProductResolvers<
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CategoryResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["Category"] = ResolversParentTypes["Category"],
+> = {
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = MercuriusContext> = {
   Query?: QueryResolvers<ContextType>;
   Product?: ProductResolvers<ContextType>;
+  Category?: CategoryResolvers<ContextType>;
 };
 
 export type Loader<TReturn, TObj, TParams, TContext> = (
@@ -181,6 +201,12 @@ export interface Loaders<
     slug?: LoaderResolver<Scalars["String"], Product, {}, TContext>;
     description?: LoaderResolver<Scalars["String"], Product, {}, TContext>;
     price?: LoaderResolver<Scalars["Int"], Product, {}, TContext>;
+  };
+
+  Category?: {
+    id?: LoaderResolver<Scalars["Int"], Category, {}, TContext>;
+    name?: LoaderResolver<Scalars["String"], Category, {}, TContext>;
+    slug?: LoaderResolver<Scalars["String"], Category, {}, TContext>;
   };
 }
 declare module "mercurius" {

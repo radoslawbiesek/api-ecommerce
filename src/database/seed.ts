@@ -1,32 +1,44 @@
-import "dotenv/config";
-
-import { generateMockCategory, generateMockProduct } from "tests/mock.js";
+import { saveMockCategory, saveMockCollection, saveMockProduct, saveMockProductImage } from "tests/mock.js";
 
 import { db, sqlite } from "./client.js";
-import { type Category, products, categories, productsToCategories } from "./schema.js";
+import { imagesToProductsTable, productsToCategoriesTable, productsToCollectionsTable } from "./schema.js";
 
-const createdCategories: Category[] = [];
-for (let i = 0; i < 10; i++) {
-  const category = generateMockCategory();
-  const result = await db.insert(categories).values(category).returning();
-  const id = result[0].id;
-  createdCategories.push(result[0]);
+const createdCategories: number[] = [];
+for (let i = 0; i <= 2; i++) {
+  const category = await saveMockCategory();
+  createdCategories.push(category.id);
 
-  console.log(`Created category (id: ${id}, name: ${category.name})`);
+  console.log(`Created category (id: ${category.id}, name: ${category.name})`);
+}
+
+const createdCollections: number[] = [];
+for (let i = 0; i <= 3; i++) {
+  const collection = await saveMockCollection();
+  createdCollections.push(collection.id);
+
+  console.log(`Created collection (id: ${collection.id}, name: ${collection.name})`);
 }
 
 for (let i = 0; i < 100; i++) {
-  const product = generateMockProduct();
-  const result = await db.insert(products).values(product).returning();
-  const id = result[0].id;
+  const product = await saveMockProduct();
 
-  await db.insert(productsToCategories).values([
-    { productId: id, categoryId: createdCategories[i % 10].id },
-    { productId: id, categoryId: createdCategories[(i + 1) % 10].id },
-    { productId: id, categoryId: createdCategories[(i + 2) % 10].id },
-  ]);
+  const productImagesIds: number[] = [];
+  for (let i = 0; i < 3; i++) {
+    const response = await fetch("https://picsum.photos/500");
+    const url = response.url;
+    const productImage = await saveMockProductImage({ url });
+    productImagesIds.push(productImage.id);
+    console.log(`Created product image (id: ${productImage.id}, url: ${productImage.url})`);
+  }
 
-  console.log(`Created product (id: ${id}, name: ${product.name})`);
+  await db.insert(imagesToProductsTable).values(productImagesIds.map((id) => ({ productId: product.id, imageId: id })));
+  await db.insert(productsToCategoriesTable).values({ productId: product.id, categoryId: createdCategories[i % 3] });
+  await db
+    .insert(productsToCollectionsTable)
+    .values({ productId: product.id, collectionId: createdCollections[i % 3] });
+
+  console.log(`Created product (id: ${product.id}, name: ${product.name})`);
 }
 
 sqlite.close();
+process.exit(0);

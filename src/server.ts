@@ -1,6 +1,4 @@
 import Fastify from "fastify";
-import "dotenv/config";
-
 const app = Fastify({ logger: { level: "debug" } });
 
 await app.register(import("plugins/database/index.js"));

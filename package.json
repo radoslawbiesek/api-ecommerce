@@ -3,13 +3,14 @@
   "name": "api-ecommerce",
   "main": "./dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "node --import tsx --env-file=.env --watch src/server.ts",
     "build": "rimraf dist && tsc",
     "lint": "eslint --fix",
     "format": "prettier --write .",
     "db:generate-migrations": "drizzle-kit generate:sqlite",
-    "db:migrate": "tsx src/database/migrate.ts",
-    "db:seed": "tsx src/database/seed.ts",
+    "db:migrate": "tsx --env-file=.env src/database/migrate.ts",
+    "db:seed": "tsx --env-file=.env src/database/seed.ts",
+    "db:studio": "drizzle-kit studio",
     "pretest": "sqlite3 test.db '' && echo .exit | sqlite3 test.db",
     "test": "node --import tsx --test --env-file=.env.test src/**/*.test.ts && rm test.db"
   },
@@ -36,10 +37,12 @@
   },
   "dependencies": {
     "better-sqlite3": "^9.4.1",
-    "dotenv": "^16.4.2",
     "drizzle-orm": "^0.29.3",
     "fastify": "^4.26.0",
     "fastify-plugin": "^4.5.1",
     "mercurius": "^13.3.3"
+  },
+  "volta": {
+    "node": "20.11.1"
   }
 }
