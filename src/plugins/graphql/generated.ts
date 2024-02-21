@@ -33,10 +33,28 @@ export type Scalars = {
 export type Query = {
   __typename?: "Query";
   product?: Maybe<Product>;
+  products?: Maybe<Products>;
+  category?: Maybe<Category>;
+  categories?: Maybe<Categories>;
+  collection?: Maybe<Collection>;
+  collections?: Maybe<Collections>;
 };
 
 export type QueryproductArgs = {
   id: Scalars["Int"];
+};
+
+export type QueryproductsArgs = {
+  take?: InputMaybe<Scalars["Int"]>;
+  skip?: InputMaybe<Scalars["Int"]>;
+};
+
+export type QuerycategoryArgs = {
+  slug: Scalars["String"];
+};
+
+export type QuerycollectionArgs = {
+  slug: Scalars["String"];
 };
 
 export type Product = {
@@ -48,11 +66,60 @@ export type Product = {
   price: Scalars["Int"];
 };
 
+export type Products = {
+  __typename?: "Products";
+  data: Array<Maybe<Product>>;
+  meta?: Maybe<Meta>;
+};
+
+export type CategoryListItem = {
+  __typename?: "CategoryListItem";
+  id: Scalars["Int"];
+  name: Scalars["String"];
+  slug: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+};
+
 export type Category = {
   __typename?: "Category";
   id: Scalars["Int"];
   name: Scalars["String"];
   slug: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+  products?: Maybe<Products>;
+};
+
+export type Categories = {
+  __typename?: "Categories";
+  data?: Maybe<Array<Maybe<CategoryListItem>>>;
+};
+
+export type CollectionListItem = {
+  __typename?: "CollectionListItem";
+  id: Scalars["Int"];
+  name: Scalars["String"];
+  slug: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+};
+
+export type Collection = {
+  __typename?: "Collection";
+  id: Scalars["Int"];
+  name: Scalars["String"];
+  slug: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+  products?: Maybe<Products>;
+};
+
+export type Collections = {
+  __typename?: "Collections";
+  data?: Maybe<Array<Maybe<CollectionListItem>>>;
+};
+
+export type Meta = {
+  __typename?: "Meta";
+  total: Scalars["Int"];
+  count: Scalars["Int"];
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -122,9 +189,16 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   Int: ResolverTypeWrapper<Scalars["Int"]>;
-  Product: ResolverTypeWrapper<Product>;
   String: ResolverTypeWrapper<Scalars["String"]>;
+  Product: ResolverTypeWrapper<Product>;
+  Products: ResolverTypeWrapper<Products>;
+  CategoryListItem: ResolverTypeWrapper<CategoryListItem>;
   Category: ResolverTypeWrapper<Category>;
+  Categories: ResolverTypeWrapper<Categories>;
+  CollectionListItem: ResolverTypeWrapper<CollectionListItem>;
+  Collection: ResolverTypeWrapper<Collection>;
+  Collections: ResolverTypeWrapper<Collections>;
+  Meta: ResolverTypeWrapper<Meta>;
   Boolean: ResolverTypeWrapper<Scalars["Boolean"]>;
 };
 
@@ -132,9 +206,16 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Query: {};
   Int: Scalars["Int"];
-  Product: Product;
   String: Scalars["String"];
+  Product: Product;
+  Products: Products;
+  CategoryListItem: CategoryListItem;
   Category: Category;
+  Categories: Categories;
+  CollectionListItem: CollectionListItem;
+  Collection: Collection;
+  Collections: Collections;
+  Meta: Meta;
   Boolean: Scalars["Boolean"];
 };
 
@@ -143,6 +224,21 @@ export type QueryResolvers<
   ParentType extends ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
 > = {
   product?: Resolver<Maybe<ResolversTypes["Product"]>, ParentType, ContextType, RequireFields<QueryproductArgs, "id">>;
+  products?: Resolver<Maybe<ResolversTypes["Products"]>, ParentType, ContextType, Partial<QueryproductsArgs>>;
+  category?: Resolver<
+    Maybe<ResolversTypes["Category"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QuerycategoryArgs, "slug">
+  >;
+  categories?: Resolver<Maybe<ResolversTypes["Categories"]>, ParentType, ContextType>;
+  collection?: Resolver<
+    Maybe<ResolversTypes["Collection"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QuerycollectionArgs, "slug">
+  >;
+  collections?: Resolver<Maybe<ResolversTypes["Collections"]>, ParentType, ContextType>;
 };
 
 export type ProductResolvers<
@@ -157,6 +253,26 @@ export type ProductResolvers<
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type ProductsResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["Products"] = ResolversParentTypes["Products"],
+> = {
+  data?: Resolver<Array<Maybe<ResolversTypes["Product"]>>, ParentType, ContextType>;
+  meta?: Resolver<Maybe<ResolversTypes["Meta"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CategoryListItemResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["CategoryListItem"] = ResolversParentTypes["CategoryListItem"],
+> = {
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CategoryResolvers<
   ContextType = MercuriusContext,
   ParentType extends ResolversParentTypes["Category"] = ResolversParentTypes["Category"],
@@ -164,13 +280,70 @@ export type CategoryResolvers<
   id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  products?: Resolver<Maybe<ResolversTypes["Products"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CategoriesResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["Categories"] = ResolversParentTypes["Categories"],
+> = {
+  data?: Resolver<Maybe<Array<Maybe<ResolversTypes["CategoryListItem"]>>>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CollectionListItemResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["CollectionListItem"] = ResolversParentTypes["CollectionListItem"],
+> = {
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CollectionResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["Collection"] = ResolversParentTypes["Collection"],
+> = {
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  products?: Resolver<Maybe<ResolversTypes["Products"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CollectionsResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["Collections"] = ResolversParentTypes["Collections"],
+> = {
+  data?: Resolver<Maybe<Array<Maybe<ResolversTypes["CollectionListItem"]>>>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MetaResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["Meta"] = ResolversParentTypes["Meta"],
+> = {
+  total?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  count?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = MercuriusContext> = {
   Query?: QueryResolvers<ContextType>;
   Product?: ProductResolvers<ContextType>;
+  Products?: ProductsResolvers<ContextType>;
+  CategoryListItem?: CategoryListItemResolvers<ContextType>;
   Category?: CategoryResolvers<ContextType>;
+  Categories?: CategoriesResolvers<ContextType>;
+  CollectionListItem?: CollectionListItemResolvers<ContextType>;
+  Collection?: CollectionResolvers<ContextType>;
+  Collections?: CollectionsResolvers<ContextType>;
+  Meta?: MetaResolvers<ContextType>;
 };
 
 export type Loader<TReturn, TObj, TParams, TContext> = (
@@ -203,10 +376,52 @@ export interface Loaders<
     price?: LoaderResolver<Scalars["Int"], Product, {}, TContext>;
   };
 
+  Products?: {
+    data?: LoaderResolver<Array<Maybe<Product>>, Products, {}, TContext>;
+    meta?: LoaderResolver<Maybe<Meta>, Products, {}, TContext>;
+  };
+
+  CategoryListItem?: {
+    id?: LoaderResolver<Scalars["Int"], CategoryListItem, {}, TContext>;
+    name?: LoaderResolver<Scalars["String"], CategoryListItem, {}, TContext>;
+    slug?: LoaderResolver<Scalars["String"], CategoryListItem, {}, TContext>;
+    description?: LoaderResolver<Maybe<Scalars["String"]>, CategoryListItem, {}, TContext>;
+  };
+
   Category?: {
     id?: LoaderResolver<Scalars["Int"], Category, {}, TContext>;
     name?: LoaderResolver<Scalars["String"], Category, {}, TContext>;
     slug?: LoaderResolver<Scalars["String"], Category, {}, TContext>;
+    description?: LoaderResolver<Maybe<Scalars["String"]>, Category, {}, TContext>;
+    products?: LoaderResolver<Maybe<Products>, Category, {}, TContext>;
+  };
+
+  Categories?: {
+    data?: LoaderResolver<Maybe<Array<Maybe<CategoryListItem>>>, Categories, {}, TContext>;
+  };
+
+  CollectionListItem?: {
+    id?: LoaderResolver<Scalars["Int"], CollectionListItem, {}, TContext>;
+    name?: LoaderResolver<Scalars["String"], CollectionListItem, {}, TContext>;
+    slug?: LoaderResolver<Scalars["String"], CollectionListItem, {}, TContext>;
+    description?: LoaderResolver<Maybe<Scalars["String"]>, CollectionListItem, {}, TContext>;
+  };
+
+  Collection?: {
+    id?: LoaderResolver<Scalars["Int"], Collection, {}, TContext>;
+    name?: LoaderResolver<Scalars["String"], Collection, {}, TContext>;
+    slug?: LoaderResolver<Scalars["String"], Collection, {}, TContext>;
+    description?: LoaderResolver<Maybe<Scalars["String"]>, Collection, {}, TContext>;
+    products?: LoaderResolver<Maybe<Products>, Collection, {}, TContext>;
+  };
+
+  Collections?: {
+    data?: LoaderResolver<Maybe<Array<Maybe<CollectionListItem>>>, Collections, {}, TContext>;
+  };
+
+  Meta?: {
+    total?: LoaderResolver<Scalars["Int"], Meta, {}, TContext>;
+    count?: LoaderResolver<Scalars["Int"], Meta, {}, TContext>;
   };
 }
 declare module "mercurius" {

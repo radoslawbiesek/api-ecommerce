@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
+import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
-import { type Db } from "database/client.js";
 import { type NewCategory, type Category, categoriesTable } from "database/schema.js";
 
 export class CategoriesRepository {
-  constructor(private readonly db: Db) {}
+  constructor(private readonly db: BetterSQLite3Database) {}
 
   async create(product: NewCategory): Promise<Category> {
     const result = await this.db.insert(categoriesTable).values(product).returning();
@@ -18,6 +18,12 @@ export class CategoriesRepository {
 
   async findById(id: number): Promise<Category | undefined> {
     const result = await this.db.select().from(categoriesTable).where(eq(categoriesTable.id, id));
+
+    return result[0];
+  }
+
+  async findBySlug(slug: string): Promise<Category | undefined> {
+    const result = await this.db.select().from(categoriesTable).where(eq(categoriesTable.slug, slug));
 
     return result[0];
   }
