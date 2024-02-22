@@ -28,10 +28,12 @@ CREATE TABLE `images_to_products` (
 --> statement-breakpoint
 CREATE TABLE `product_images` (
 	`id` integer PRIMARY KEY NOT NULL,
+	`product_id` integer,
 	`alt` text NOT NULL,
 	`url` text NOT NULL,
 	`height` integer NOT NULL,
-	`width` integer NOT NULL
+	`width` integer NOT NULL,
+	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `products` (
@@ -41,6 +43,8 @@ CREATE TABLE `products` (
 	`description` text NOT NULL,
 	`price` integer NOT NULL,
 	`rating` integer,
+	`sizes` text,
+	`variants` text,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text
 );

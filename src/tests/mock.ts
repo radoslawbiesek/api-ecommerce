@@ -24,6 +24,8 @@ export function generateMockProduct(overrides: Partial<NewProduct> = {}): NewPro
     slug: faker.helpers.slugify(name).toLowerCase(),
     description: faker.commerce.productDescription(),
     price: parseInt(faker.commerce.price({ min: 100, max: 1000 })),
+    sizes: JSON.stringify(["S", "M", "L", "XL"]),
+    variants: JSON.stringify(Array.from({ length: 3 }, () => faker.commerce.productMaterial())),
     ...overrides,
   };
 }

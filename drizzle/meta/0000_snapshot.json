@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "5859e7cf-8a55-4e22-bbcb-d3f5431ce0e7",
+  "id": "c0cdb137-d687-4aac-9f24-969698d413aa",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -147,8 +147,12 @@
           "name": "images_to_products_image_id_product_images_id_fk",
           "tableFrom": "images_to_products",
           "tableTo": "product_images",
-          "columnsFrom": ["image_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "image_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -156,15 +160,22 @@
           "name": "images_to_products_product_id_products_id_fk",
           "tableFrom": "images_to_products",
           "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "images_to_products_image_id_product_id_pk": {
-          "columns": ["image_id", "product_id"],
+          "columns": [
+            "image_id",
+            "product_id"
+          ],
           "name": "images_to_products_image_id_product_id_pk"
         }
       },
@@ -178,6 +189,13 @@
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
+          "autoincrement": false
+        },
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "alt": {
@@ -210,7 +228,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "product_images_product_id_products_id_fk": {
+          "name": "product_images_product_id_products_id_fk",
+          "tableFrom": "product_images",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -255,6 +287,20 @@
         "rating": {
           "name": "rating",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "sizes": {
+          "name": "sizes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "variants": {
+          "name": "variants",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -312,8 +358,12 @@
           "name": "products_to_categories_product_id_products_id_fk",
           "tableFrom": "products_to_categories",
           "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -321,15 +371,22 @@
           "name": "products_to_categories_category_id_categories_id_fk",
           "tableFrom": "products_to_categories",
           "tableTo": "categories",
-          "columnsFrom": ["category_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "category_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "products_to_categories_product_id_category_id_pk": {
-          "columns": ["category_id", "product_id"],
+          "columns": [
+            "category_id",
+            "product_id"
+          ],
           "name": "products_to_categories_product_id_category_id_pk"
         }
       },
@@ -367,8 +424,12 @@
           "name": "products_to_collections_product_id_products_id_fk",
           "tableFrom": "products_to_collections",
           "tableTo": "products",
-          "columnsFrom": ["product_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -376,15 +437,22 @@
           "name": "products_to_collections_collection_id_collections_id_fk",
           "tableFrom": "products_to_collections",
           "tableTo": "collections",
-          "columnsFrom": ["collection_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "collection_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "products_to_collections_product_id_collection_id_pk": {
-          "columns": ["collection_id", "product_id"],
+          "columns": [
+            "collection_id",
+            "product_id"
+          ],
           "name": "products_to_collections_product_id_collection_id_pk"
         }
       },

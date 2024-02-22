@@ -12,8 +12,8 @@ const DEFAULT_SKIP = 0;
 
 const schema = gql`
   type Query {
-    product(id: Int!): Product
-    products(take: Int, skip: Int): Products
+    product(slug: String!): Product
+    products(take: Int, skip: Int, search: String): Products
     category(slug: String!): Category
     categories: Categories
     collection(slug: String!): Collection
@@ -26,11 +26,20 @@ const schema = gql`
     slug: String!
     description: String!
     price: Int!
+    images: [Image!]!
+  }
+
+  type Image {
+    id: Int!
+    url: String!
+    alt: String
+    height: Int!
+    width: Int!
   }
 
   type Products {
-    data: [Product]!
-    meta: Meta
+    data: [Product!]!
+    meta: Meta!
   }
 
   type CategoryListItem {
@@ -45,11 +54,11 @@ const schema = gql`
     name: String!
     slug: String!
     description: String
-    products: Products
+    products: Products!
   }
 
   type Categories {
-    data: [CategoryListItem]
+    data: [CategoryListItem!]!
   }
 
   type CollectionListItem {
@@ -64,25 +73,24 @@ const schema = gql`
     name: String!
     slug: String!
     description: String
-    products: Products
+    products: Products!
   }
 
   type Collections {
-    data: [CollectionListItem]
+    data: [CollectionListItem!]!
   }
 
   type Meta {
     total: Int!
-    count: Int!
   }
 `;
 
 const resolvers: IResolvers = {
   Query: {
-    product: async function product(_parent, args: { id: number }, context) {
+    product: async function product(_parent, args: { slug: string }, context) {
       const productsRepository = new ProductsRepository(context.app.db);
 
-      return productsRepository.findById(args.id);
+      return productsRepository.findBySlug(args.slug);
     },
 
     products: async function products(_parent, args: { take?: number; skip?: number }, context) {
@@ -91,13 +99,11 @@ const resolvers: IResolvers = {
       const skip = args.skip || DEFAULT_SKIP;
 
       const data = await productsRepository.findAll({ take, skip });
-      const total = data[0].count;
-
+      const total = await productsRepository.findAllCount();
       return {
         data,
         meta: {
           total,
-          count: take,
         },
       };
     },
@@ -136,12 +142,12 @@ const resolvers: IResolvers = {
       const skip = args.skip || DEFAULT_SKIP;
 
       const data = await productsRepository.findAllByCategory(parent.id, { take, skip });
+      const total = await productsRepository.findAllByCategoryCount(parent.id);
 
       return {
         data,
         meta: {
-          total: data.length,
-          count: take,
+          total,
         },
       };
     },
@@ -154,14 +160,22 @@ const resolvers: IResolvers = {
       const skip = args.skip || DEFAULT_SKIP;
 
       const data = await productsRepository.findAllByCollection(parent.id, { take, skip });
+      const total = await productsRepository.findAllByCollectionCount(parent.id);
 
       return {
         data,
         meta: {
-          total: data.length,
-          count: take,
+          total,
         },
       };
+    },
+  },
+
+  Product: {
+    images: async function images(parent: { id: number }, _args, context) {
+      const productsRepository = new ProductsRepository(context.app.db);
+
+      return productsRepository.findImages(parent.id);
     },
   },
 };

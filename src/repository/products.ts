@@ -1,18 +1,15 @@
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { eq, sql } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 
-import { categoriesTable, type Category, type NewProduct, type Product, productsTable } from "database/schema.js";
-
-const allColumns = {
-  id: productsTable.id,
-  name: productsTable.name,
-  slug: productsTable.slug,
-  description: productsTable.description,
-  price: productsTable.price,
-  rating: productsTable.rating,
-  createdAt: productsTable.createdAt,
-  updatedAt: productsTable.updatedAt,
-};
+import {
+  type NewProduct,
+  type Product,
+  type ProductImage,
+  productsTable,
+  productImagesTable,
+  productsToCollectionsTable,
+  productsToCategoriesTable,
+} from "database/schema.js";
 
 type Params = {
   take: number;
@@ -28,43 +25,58 @@ export class ProductsRepository {
     return result[0];
   }
 
-  async findAll({ take, skip }: Params): Promise<(Product & { count: number })[]> {
-    const result = await this.db
-      .select({
-        ...allColumns,
-        count: sql<number>`(select count(*) from products) as count`,
-      })
-      .from(productsTable)
-      .limit(take)
-      .offset(skip);
+  async findAll({ take, skip }: Params): Promise<Product[]> {
+    const result = await this.db.select().from(productsTable).limit(take).offset(skip);
 
     return result;
+  }
+
+  async findAllCount(): Promise<number> {
+    const result = await this.db.select({ value: count() }).from(productsTable);
+
+    return result[0].value;
   }
 
   async findAllByCategory(categoryId: number, { take, skip }: Params): Promise<Product[]> {
     const result = await this.db
       .select()
-      .from(productsTable)
-      .leftJoin(categoriesTable, eq(categoriesTable.id, categoryId))
+      .from(productsToCategoriesTable)
+      .where(eq(productsToCategoriesTable.categoryId, categoryId))
+      .leftJoin(productsTable, eq(productsToCategoriesTable.productId, productsTable.id))
       .limit(take)
       .offset(skip);
 
-    // to do - fix count
+    return result.map((r) => r.products).filter((v): v is Product => !!v);
+  }
 
-    return result.map((r) => r.products);
+  async findAllByCategoryCount(categoryId: number): Promise<number> {
+    const result = await this.db
+      .select({ value: count() })
+      .from(productsToCategoriesTable)
+      .where(eq(productsToCategoriesTable.categoryId, categoryId));
+
+    return result[0].value;
   }
 
   async findAllByCollection(collectionId: number, { take, skip }: Params): Promise<Product[]> {
     const result = await this.db
       .select()
-      .from(productsTable)
-      .leftJoin(categoriesTable, eq(categoriesTable.id, collectionId))
+      .from(productsToCollectionsTable)
+      .where(eq(productsToCollectionsTable.collectionId, collectionId))
+      .leftJoin(productsTable, eq(productsToCollectionsTable.productId, productsTable.id))
       .limit(take)
       .offset(skip);
 
-    // to do - fix count
+    return result.map((r) => r.products).filter((v): v is Product => !!v);
+  }
 
-    return result.map((r) => r.products);
+  async findAllByCollectionCount(collectionId: number): Promise<number> {
+    const result = await this.db
+      .select({ value: count() })
+      .from(productsToCollectionsTable)
+      .where(eq(productsToCollectionsTable.collectionId, collectionId));
+
+    return result[0].value;
   }
 
   async findById(id: number): Promise<Product | undefined> {
@@ -73,8 +85,16 @@ export class ProductsRepository {
     return result[0];
   }
 
-  async findCategories(id: number): Promise<Category[]> {
-    return this.db.select().from(categoriesTable).where(eq(categoriesTable.id, id));
+  async findImages(productId: number): Promise<ProductImage[]> {
+    const result = await this.db.select().from(productImagesTable).where(eq(productImagesTable.productId, productId));
+
+    return result;
+  }
+
+  async findBySlug(slug: string): Promise<Product | undefined> {
+    const result = await this.db.select().from(productsTable).where(eq(productsTable.slug, slug));
+
+    return result[0];
   }
 
   async update(id: number, product: NewProduct): Promise<Product> {

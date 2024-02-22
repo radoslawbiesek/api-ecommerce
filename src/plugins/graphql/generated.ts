@@ -16,7 +16,9 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   args: TArgs,
   context: TContext,
   info: GraphQLResolveInfo,
-) => Promise<import("mercurius-codegen").DeepPartial<TResult>> | import("mercurius-codegen").DeepPartial<TResult>;
+) =>
+  | Promise<import("mercurius-codegen").DeepPartial<TResult>>
+  | import("mercurius-codegen").DeepPartial<TResult>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
   [P in K]-?: NonNullable<T[P]>;
 };
@@ -41,12 +43,13 @@ export type Query = {
 };
 
 export type QueryproductArgs = {
-  id: Scalars["Int"];
+  slug: Scalars["String"];
 };
 
 export type QueryproductsArgs = {
   take?: InputMaybe<Scalars["Int"]>;
   skip?: InputMaybe<Scalars["Int"]>;
+  search?: InputMaybe<Scalars["String"]>;
 };
 
 export type QuerycategoryArgs = {
@@ -64,12 +67,22 @@ export type Product = {
   slug: Scalars["String"];
   description: Scalars["String"];
   price: Scalars["Int"];
+  images: Array<Image>;
+};
+
+export type Image = {
+  __typename?: "Image";
+  id: Scalars["Int"];
+  url: Scalars["String"];
+  alt?: Maybe<Scalars["String"]>;
+  height: Scalars["Int"];
+  width: Scalars["Int"];
 };
 
 export type Products = {
   __typename?: "Products";
-  data: Array<Maybe<Product>>;
-  meta?: Maybe<Meta>;
+  data: Array<Product>;
+  meta: Meta;
 };
 
 export type CategoryListItem = {
@@ -86,12 +99,12 @@ export type Category = {
   name: Scalars["String"];
   slug: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
-  products?: Maybe<Products>;
+  products: Products;
 };
 
 export type Categories = {
   __typename?: "Categories";
-  data?: Maybe<Array<Maybe<CategoryListItem>>>;
+  data: Array<CategoryListItem>;
 };
 
 export type CollectionListItem = {
@@ -108,18 +121,17 @@ export type Collection = {
   name: Scalars["String"];
   slug: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
-  products?: Maybe<Products>;
+  products: Products;
 };
 
 export type Collections = {
   __typename?: "Collections";
-  data?: Maybe<Array<Maybe<CollectionListItem>>>;
+  data: Array<CollectionListItem>;
 };
 
 export type Meta = {
   __typename?: "Meta";
   total: Scalars["Int"];
-  count: Scalars["Int"];
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -145,9 +157,25 @@ export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
   info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>;
 
-export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
-  subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
-  resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
+export interface SubscriptionSubscriberObject<
+  TResult,
+  TKey extends string,
+  TParent,
+  TContext,
+  TArgs,
+> {
+  subscribe: SubscriptionSubscribeFn<
+    { [key in TKey]: TResult },
+    TParent,
+    TContext,
+    TArgs
+  >;
+  resolve?: SubscriptionResolveFn<
+    TResult,
+    { [key in TKey]: TResult },
+    TContext,
+    TArgs
+  >;
 }
 
 export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
@@ -155,12 +183,26 @@ export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
   resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
 }
 
-export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
+export type SubscriptionObject<
+  TResult,
+  TKey extends string,
+  TParent,
+  TContext,
+  TArgs,
+> =
   | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
   | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
 
-export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
-  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+export type SubscriptionResolver<
+  TResult,
+  TKey extends string,
+  TParent = {},
+  TContext = {},
+  TArgs = {},
+> =
+  | ((
+      ...args: any[]
+    ) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
   | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
@@ -177,7 +219,12 @@ export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
 
 export type NextResolverFn<T> = () => Promise<T>;
 
-export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
+export type DirectiveResolverFn<
+  TResult = {},
+  TParent = {},
+  TContext = {},
+  TArgs = {},
+> = (
   next: NextResolverFn<TResult>,
   parent: TParent,
   args: TArgs,
@@ -188,9 +235,10 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
-  Int: ResolverTypeWrapper<Scalars["Int"]>;
   String: ResolverTypeWrapper<Scalars["String"]>;
+  Int: ResolverTypeWrapper<Scalars["Int"]>;
   Product: ResolverTypeWrapper<Product>;
+  Image: ResolverTypeWrapper<Image>;
   Products: ResolverTypeWrapper<Products>;
   CategoryListItem: ResolverTypeWrapper<CategoryListItem>;
   Category: ResolverTypeWrapper<Category>;
@@ -205,9 +253,10 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Query: {};
-  Int: Scalars["Int"];
   String: Scalars["String"];
+  Int: Scalars["Int"];
   Product: Product;
+  Image: Image;
   Products: Products;
   CategoryListItem: CategoryListItem;
   Category: Category;
@@ -221,121 +270,187 @@ export type ResolversParentTypes = {
 
 export type QueryResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
+  ParentType extends
+    ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
 > = {
-  product?: Resolver<Maybe<ResolversTypes["Product"]>, ParentType, ContextType, RequireFields<QueryproductArgs, "id">>;
-  products?: Resolver<Maybe<ResolversTypes["Products"]>, ParentType, ContextType, Partial<QueryproductsArgs>>;
+  product?: Resolver<
+    Maybe<ResolversTypes["Product"]>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryproductArgs, "slug">
+  >;
+  products?: Resolver<
+    Maybe<ResolversTypes["Products"]>,
+    ParentType,
+    ContextType,
+    Partial<QueryproductsArgs>
+  >;
   category?: Resolver<
     Maybe<ResolversTypes["Category"]>,
     ParentType,
     ContextType,
     RequireFields<QuerycategoryArgs, "slug">
   >;
-  categories?: Resolver<Maybe<ResolversTypes["Categories"]>, ParentType, ContextType>;
+  categories?: Resolver<
+    Maybe<ResolversTypes["Categories"]>,
+    ParentType,
+    ContextType
+  >;
   collection?: Resolver<
     Maybe<ResolversTypes["Collection"]>,
     ParentType,
     ContextType,
     RequireFields<QuerycollectionArgs, "slug">
   >;
-  collections?: Resolver<Maybe<ResolversTypes["Collections"]>, ParentType, ContextType>;
+  collections?: Resolver<
+    Maybe<ResolversTypes["Collections"]>,
+    ParentType,
+    ContextType
+  >;
 };
 
 export type ProductResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["Product"] = ResolversParentTypes["Product"],
+  ParentType extends
+    ResolversParentTypes["Product"] = ResolversParentTypes["Product"],
 > = {
   id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   description?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   price?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  images?: Resolver<Array<ResolversTypes["Image"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ImageResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends
+    ResolversParentTypes["Image"] = ResolversParentTypes["Image"],
+> = {
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  alt?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  height?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  width?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type ProductsResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["Products"] = ResolversParentTypes["Products"],
+  ParentType extends
+    ResolversParentTypes["Products"] = ResolversParentTypes["Products"],
 > = {
-  data?: Resolver<Array<Maybe<ResolversTypes["Product"]>>, ParentType, ContextType>;
-  meta?: Resolver<Maybe<ResolversTypes["Meta"]>, ParentType, ContextType>;
+  data?: Resolver<Array<ResolversTypes["Product"]>, ParentType, ContextType>;
+  meta?: Resolver<ResolversTypes["Meta"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CategoryListItemResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["CategoryListItem"] = ResolversParentTypes["CategoryListItem"],
+  ParentType extends
+    ResolversParentTypes["CategoryListItem"] = ResolversParentTypes["CategoryListItem"],
 > = {
   id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  description?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CategoryResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["Category"] = ResolversParentTypes["Category"],
+  ParentType extends
+    ResolversParentTypes["Category"] = ResolversParentTypes["Category"],
 > = {
   id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  products?: Resolver<Maybe<ResolversTypes["Products"]>, ParentType, ContextType>;
+  description?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  products?: Resolver<ResolversTypes["Products"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CategoriesResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["Categories"] = ResolversParentTypes["Categories"],
+  ParentType extends
+    ResolversParentTypes["Categories"] = ResolversParentTypes["Categories"],
 > = {
-  data?: Resolver<Maybe<Array<Maybe<ResolversTypes["CategoryListItem"]>>>, ParentType, ContextType>;
+  data?: Resolver<
+    Array<ResolversTypes["CategoryListItem"]>,
+    ParentType,
+    ContextType
+  >;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CollectionListItemResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["CollectionListItem"] = ResolversParentTypes["CollectionListItem"],
+  ParentType extends
+    ResolversParentTypes["CollectionListItem"] = ResolversParentTypes["CollectionListItem"],
 > = {
   id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
+  description?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CollectionResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["Collection"] = ResolversParentTypes["Collection"],
+  ParentType extends
+    ResolversParentTypes["Collection"] = ResolversParentTypes["Collection"],
 > = {
   id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
-  description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  products?: Resolver<Maybe<ResolversTypes["Products"]>, ParentType, ContextType>;
+  description?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
+  products?: Resolver<ResolversTypes["Products"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CollectionsResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["Collections"] = ResolversParentTypes["Collections"],
+  ParentType extends
+    ResolversParentTypes["Collections"] = ResolversParentTypes["Collections"],
 > = {
-  data?: Resolver<Maybe<Array<Maybe<ResolversTypes["CollectionListItem"]>>>, ParentType, ContextType>;
+  data?: Resolver<
+    Array<ResolversTypes["CollectionListItem"]>,
+    ParentType,
+    ContextType
+  >;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MetaResolvers<
   ContextType = MercuriusContext,
-  ParentType extends ResolversParentTypes["Meta"] = ResolversParentTypes["Meta"],
+  ParentType extends
+    ResolversParentTypes["Meta"] = ResolversParentTypes["Meta"],
 > = {
   total?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-  count?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = MercuriusContext> = {
   Query?: QueryResolvers<ContextType>;
   Product?: ProductResolvers<ContextType>;
+  Image?: ImageResolvers<ContextType>;
   Products?: ProductsResolvers<ContextType>;
   CategoryListItem?: CategoryListItemResolvers<ContextType>;
   Category?: CategoryResolvers<ContextType>;
@@ -374,57 +489,86 @@ export interface Loaders<
     slug?: LoaderResolver<Scalars["String"], Product, {}, TContext>;
     description?: LoaderResolver<Scalars["String"], Product, {}, TContext>;
     price?: LoaderResolver<Scalars["Int"], Product, {}, TContext>;
+    images?: LoaderResolver<Array<Image>, Product, {}, TContext>;
+  };
+
+  Image?: {
+    id?: LoaderResolver<Scalars["Int"], Image, {}, TContext>;
+    url?: LoaderResolver<Scalars["String"], Image, {}, TContext>;
+    alt?: LoaderResolver<Maybe<Scalars["String"]>, Image, {}, TContext>;
+    height?: LoaderResolver<Scalars["Int"], Image, {}, TContext>;
+    width?: LoaderResolver<Scalars["Int"], Image, {}, TContext>;
   };
 
   Products?: {
-    data?: LoaderResolver<Array<Maybe<Product>>, Products, {}, TContext>;
-    meta?: LoaderResolver<Maybe<Meta>, Products, {}, TContext>;
+    data?: LoaderResolver<Array<Product>, Products, {}, TContext>;
+    meta?: LoaderResolver<Meta, Products, {}, TContext>;
   };
 
   CategoryListItem?: {
     id?: LoaderResolver<Scalars["Int"], CategoryListItem, {}, TContext>;
     name?: LoaderResolver<Scalars["String"], CategoryListItem, {}, TContext>;
     slug?: LoaderResolver<Scalars["String"], CategoryListItem, {}, TContext>;
-    description?: LoaderResolver<Maybe<Scalars["String"]>, CategoryListItem, {}, TContext>;
+    description?: LoaderResolver<
+      Maybe<Scalars["String"]>,
+      CategoryListItem,
+      {},
+      TContext
+    >;
   };
 
   Category?: {
     id?: LoaderResolver<Scalars["Int"], Category, {}, TContext>;
     name?: LoaderResolver<Scalars["String"], Category, {}, TContext>;
     slug?: LoaderResolver<Scalars["String"], Category, {}, TContext>;
-    description?: LoaderResolver<Maybe<Scalars["String"]>, Category, {}, TContext>;
-    products?: LoaderResolver<Maybe<Products>, Category, {}, TContext>;
+    description?: LoaderResolver<
+      Maybe<Scalars["String"]>,
+      Category,
+      {},
+      TContext
+    >;
+    products?: LoaderResolver<Products, Category, {}, TContext>;
   };
 
   Categories?: {
-    data?: LoaderResolver<Maybe<Array<Maybe<CategoryListItem>>>, Categories, {}, TContext>;
+    data?: LoaderResolver<Array<CategoryListItem>, Categories, {}, TContext>;
   };
 
   CollectionListItem?: {
     id?: LoaderResolver<Scalars["Int"], CollectionListItem, {}, TContext>;
     name?: LoaderResolver<Scalars["String"], CollectionListItem, {}, TContext>;
     slug?: LoaderResolver<Scalars["String"], CollectionListItem, {}, TContext>;
-    description?: LoaderResolver<Maybe<Scalars["String"]>, CollectionListItem, {}, TContext>;
+    description?: LoaderResolver<
+      Maybe<Scalars["String"]>,
+      CollectionListItem,
+      {},
+      TContext
+    >;
   };
 
   Collection?: {
     id?: LoaderResolver<Scalars["Int"], Collection, {}, TContext>;
     name?: LoaderResolver<Scalars["String"], Collection, {}, TContext>;
     slug?: LoaderResolver<Scalars["String"], Collection, {}, TContext>;
-    description?: LoaderResolver<Maybe<Scalars["String"]>, Collection, {}, TContext>;
-    products?: LoaderResolver<Maybe<Products>, Collection, {}, TContext>;
+    description?: LoaderResolver<
+      Maybe<Scalars["String"]>,
+      Collection,
+      {},
+      TContext
+    >;
+    products?: LoaderResolver<Products, Collection, {}, TContext>;
   };
 
   Collections?: {
-    data?: LoaderResolver<Maybe<Array<Maybe<CollectionListItem>>>, Collections, {}, TContext>;
+    data?: LoaderResolver<Array<CollectionListItem>, Collections, {}, TContext>;
   };
 
   Meta?: {
     total?: LoaderResolver<Scalars["Int"], Meta, {}, TContext>;
-    count?: LoaderResolver<Scalars["Int"], Meta, {}, TContext>;
   };
 }
 declare module "mercurius" {
-  interface IResolvers extends Resolvers<import("mercurius").MercuriusContext> {}
+  interface IResolvers
+    extends Resolvers<import("mercurius").MercuriusContext> {}
   interface MercuriusLoaders extends Loaders {}
 }
