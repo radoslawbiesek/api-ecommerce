@@ -4,6 +4,7 @@ export const schema = gql`
   type Query {
     product(slug: String!): Product
     products(take: Int, skip: Int, search: String): Products
+    recommended_products(productId: Int!, take: Int): Products
     category(slug: String!): Category
     categories: Categories
     collection(slug: String!): Collection

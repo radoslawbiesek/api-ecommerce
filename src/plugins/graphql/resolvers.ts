@@ -27,6 +27,18 @@ export const resolvers: IResolvers = {
       };
     },
 
+    recommended_products: async function recommendedProducts(
+      _parent,
+      args: { productId: number; take?: number },
+      context,
+    ) {
+      const productsRepository = new ProductsRepository(context.app.db);
+
+      const data = productsRepository.findRecommendedProducts(args.productId, args);
+
+      return { data };
+    },
+
     category: async function category(_parent, args: { slug: string }, context) {
       const categoriesRepository = new CategoriesRepository(context.app.db);
 

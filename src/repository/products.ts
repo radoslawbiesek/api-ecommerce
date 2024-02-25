@@ -1,5 +1,5 @@
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { type SQL, and, count, eq, like, or } from "drizzle-orm";
+import { type SQL, and, count, eq, like, or, not, desc } from "drizzle-orm";
 
 import {
   type NewProduct,
@@ -125,6 +125,20 @@ export class ProductsRepository {
       .map((r) => r.products)
       .filter((v): v is Product => !!v)
       .map(parseVariants);
+  }
+
+  async findRecommendedProducts(
+    productId: number,
+    { take = DEFAULT_TAKE }: { take?: number },
+  ): Promise<ProductWithVariants[]> {
+    const result = await this.db
+      .select()
+      .from(productsTable)
+      .where(not(eq(productsTable.id, productId)))
+      .orderBy(desc(productsTable.rating))
+      .limit(take);
+
+    return result.map(parseVariants);
   }
 
   async countAllByCollectionId(collectionId: number): Promise<number> {
