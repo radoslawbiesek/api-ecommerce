@@ -1,43 +1,91 @@
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { count, eq } from "drizzle-orm";
+import { type SQL, and, count, eq, like, or } from "drizzle-orm";
 
 import {
   type NewProduct,
   type Product,
-  type ProductImage,
   productsTable,
-  productImagesTable,
   productsToCollectionsTable,
   productsToCategoriesTable,
 } from "database/schema.js";
 
-type Params = {
-  take: number;
-  skip: number;
+const DEFAULT_TAKE = 10;
+const DEFAULT_SKIP = 0;
+
+type ListParams = {
+  take?: number;
+  skip?: number;
+  search?: string;
 };
+
+type ProductWithVariants = Omit<Product, "variants"> & { variants: string[] };
+
+function parseVariants(product: Product): ProductWithVariants {
+  let variants: string[] = [];
+  if (product.variants) {
+    try {
+      variants = JSON.parse(product.variants) as string[];
+    } catch {}
+  }
+
+  return {
+    ...product,
+    variants,
+  };
+}
 
 export class ProductsRepository {
   constructor(private readonly db: BetterSQLite3Database) {}
 
-  async create(product: NewProduct): Promise<Product> {
-    const result = await this.db.insert(productsTable).values(product).returning();
+  async findById(id: number): Promise<ProductWithVariants | undefined> {
+    const result = await this.db.select().from(productsTable).where(eq(productsTable.id, id));
 
-    return result[0];
+    return result.map(parseVariants)[0];
   }
 
-  async findAll({ take, skip }: Params): Promise<Product[]> {
-    const result = await this.db.select().from(productsTable).limit(take).offset(skip);
+  async findBySlug(slug: string): Promise<ProductWithVariants | undefined> {
+    const result = await this.db.select().from(productsTable).where(eq(productsTable.slug, slug));
 
-    return result;
+    return result.map(parseVariants)[0];
   }
 
-  async findAllCount(): Promise<number> {
-    const result = await this.db.select({ value: count() }).from(productsTable);
+  #getFilters({ search }: { search?: string }): SQL[] {
+    const filters: SQL[] = [];
+    if (search) {
+      const searchTerm = `%${search.toLowerCase()}%`;
+      const filter = or(like(productsTable.name, searchTerm), like(productsTable.description, searchTerm));
+      if (filter) {
+        filters.push(filter);
+      }
+    }
+
+    return filters;
+  }
+
+  async findAll({ take = DEFAULT_TAKE, skip = DEFAULT_SKIP, search }: ListParams = {}): Promise<ProductWithVariants[]> {
+    const result = await this.db
+      .select()
+      .from(productsTable)
+      .where(and(...this.#getFilters({ search })))
+      .limit(take)
+      .offset(skip);
+
+    return result.map(parseVariants);
+  }
+
+  async countAll({ search }: Pick<ListParams, "search"> = {}): Promise<number> {
+    const result = await this.db
+      .select({ value: count() })
+      .from(productsTable)
+      .where(and(...this.#getFilters({ search })));
 
     return result[0].value;
   }
 
-  async findAllByCategory(categoryId: number, { take, skip }: Params): Promise<Product[]> {
+  async findAllByCategoryId(
+    categoryId: number,
+    { take = DEFAULT_TAKE, skip = DEFAULT_SKIP }: ListParams,
+  ): Promise<ProductWithVariants[]> {
     const result = await this.db
       .select()
       .from(productsToCategoriesTable)
@@ -46,10 +94,13 @@ export class ProductsRepository {
       .limit(take)
       .offset(skip);
 
-    return result.map((r) => r.products).filter((v): v is Product => !!v);
+    return result
+      .map((r) => r.products)
+      .filter((v): v is Product => !!v)
+      .map(parseVariants);
   }
 
-  async findAllByCategoryCount(categoryId: number): Promise<number> {
+  async countAllByCategoryId(categoryId: number): Promise<number> {
     const result = await this.db
       .select({ value: count() })
       .from(productsToCategoriesTable)
@@ -58,7 +109,10 @@ export class ProductsRepository {
     return result[0].value;
   }
 
-  async findAllByCollection(collectionId: number, { take, skip }: Params): Promise<Product[]> {
+  async findAllByCollectionId(
+    collectionId: number,
+    { take = DEFAULT_TAKE, skip = DEFAULT_SKIP }: ListParams,
+  ): Promise<ProductWithVariants[]> {
     const result = await this.db
       .select()
       .from(productsToCollectionsTable)
@@ -67,10 +121,13 @@ export class ProductsRepository {
       .limit(take)
       .offset(skip);
 
-    return result.map((r) => r.products).filter((v): v is Product => !!v);
+    return result
+      .map((r) => r.products)
+      .filter((v): v is Product => !!v)
+      .map(parseVariants);
   }
 
-  async findAllByCollectionCount(collectionId: number): Promise<number> {
+  async countAllByCollectionId(collectionId: number): Promise<number> {
     const result = await this.db
       .select({ value: count() })
       .from(productsToCollectionsTable)
@@ -79,20 +136,8 @@ export class ProductsRepository {
     return result[0].value;
   }
 
-  async findById(id: number): Promise<Product | undefined> {
-    const result = await this.db.select().from(productsTable).where(eq(productsTable.id, id));
-
-    return result[0];
-  }
-
-  async findImages(productId: number): Promise<ProductImage[]> {
-    const result = await this.db.select().from(productImagesTable).where(eq(productImagesTable.productId, productId));
-
-    return result;
-  }
-
-  async findBySlug(slug: string): Promise<Product | undefined> {
-    const result = await this.db.select().from(productsTable).where(eq(productsTable.slug, slug));
+  async create(product: NewProduct): Promise<Product> {
+    const result = await this.db.insert(productsTable).values(product).returning();
 
     return result[0];
   }

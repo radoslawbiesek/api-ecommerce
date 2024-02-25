@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "c0cdb137-d687-4aac-9f24-969698d413aa",
+  "id": "a96c9e9b-2d87-4b93-a3e7-ca702f00d837",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "categories": {
@@ -82,6 +82,13 @@
         },
         "slug": {
           "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "image_url": {
+          "name": "image_url",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -291,19 +298,20 @@
           "notNull": false,
           "autoincrement": false
         },
-        "sizes": {
-          "name": "sizes",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "variants": {
           "name": "variants",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "in_stock": {
+          "name": "in_stock",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
         },
         "created_at": {
           "name": "created_at",

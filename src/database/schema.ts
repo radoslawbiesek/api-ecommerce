@@ -8,8 +8,8 @@ export const productsTable = sqliteTable("products", {
   description: text("description").notNull(),
   price: integer("price").notNull(),
   rating: integer("rating"),
-  sizes: text("sizes"),
   variants: text("variants"),
+  inStock: integer("in_stock").default(1).notNull(),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -41,6 +41,7 @@ export const collectionsTable = sqliteTable("collections", {
   name: text("name").notNull(),
   description: text("description"),
   slug: text("slug").notNull(),
+  imageUrl: text("image_url").notNull(),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

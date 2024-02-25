@@ -24,8 +24,9 @@ export function generateMockProduct(overrides: Partial<NewProduct> = {}): NewPro
     slug: faker.helpers.slugify(name).toLowerCase(),
     description: faker.commerce.productDescription(),
     price: parseInt(faker.commerce.price({ min: 100, max: 1000 })),
-    sizes: JSON.stringify(["S", "M", "L", "XL"]),
+    rating: faker.number.int({ min: 1, max: 5 }),
     variants: JSON.stringify(Array.from({ length: 3 }, () => faker.commerce.productMaterial())),
+    inStock: faker.number.int({ min: 0, max: 100 }),
     ...overrides,
   };
 }
@@ -63,9 +64,11 @@ export async function deleteMockCategories(): Promise<void> {
 }
 
 export function generateMockCollection(overrides: Partial<NewCollection> = {}): NewCollection {
+  const name = overrides.name || faker.commerce.department();
   return {
-    name: faker.commerce.department(),
-    slug: faker.helpers.slugify(faker.commerce.department()).toLowerCase(),
+    name,
+    slug: faker.helpers.slugify(name).toLowerCase(),
+    imageUrl: faker.internet.url(),
     ...overrides,
   };
 }

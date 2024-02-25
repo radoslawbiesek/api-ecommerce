@@ -12,6 +12,7 @@ CREATE TABLE `collections` (
 	`name` text NOT NULL,
 	`description` text,
 	`slug` text NOT NULL,
+	`image_url` text NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text
 );
@@ -43,8 +44,8 @@ CREATE TABLE `products` (
 	`description` text NOT NULL,
 	`price` integer NOT NULL,
 	`rating` integer,
-	`sizes` text,
 	`variants` text,
+	`in_stock` integer DEFAULT 1 NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text
 );

@@ -67,7 +67,11 @@ export type Product = {
   slug: Scalars["String"];
   description: Scalars["String"];
   price: Scalars["Int"];
+  rating: Scalars["Int"];
+  inStock: Scalars["Int"];
+  variants: Array<Scalars["String"]>;
   images: Array<Image>;
+  categories: Array<Category>;
 };
 
 export type Image = {
@@ -102,6 +106,11 @@ export type Category = {
   products: Products;
 };
 
+export type CategoryproductsArgs = {
+  take?: InputMaybe<Scalars["Int"]>;
+  skip?: InputMaybe<Scalars["Int"]>;
+};
+
 export type Categories = {
   __typename?: "Categories";
   data: Array<CategoryListItem>;
@@ -113,6 +122,7 @@ export type CollectionListItem = {
   name: Scalars["String"];
   slug: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
+  imageUrl: Scalars["String"];
 };
 
 export type Collection = {
@@ -122,6 +132,11 @@ export type Collection = {
   slug: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
   products: Products;
+};
+
+export type CollectionproductsArgs = {
+  take?: InputMaybe<Scalars["Int"]>;
+  skip?: InputMaybe<Scalars["Int"]>;
 };
 
 export type Collections = {
@@ -319,7 +334,15 @@ export type ProductResolvers<
   slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   description?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   price?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  rating?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  inStock?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  variants?: Resolver<Array<ResolversTypes["String"]>, ParentType, ContextType>;
   images?: Resolver<Array<ResolversTypes["Image"]>, ParentType, ContextType>;
+  categories?: Resolver<
+    Array<ResolversTypes["Category"]>,
+    ParentType,
+    ContextType
+  >;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -375,7 +398,12 @@ export type CategoryResolvers<
     ParentType,
     ContextType
   >;
-  products?: Resolver<ResolversTypes["Products"], ParentType, ContextType>;
+  products?: Resolver<
+    ResolversTypes["Products"],
+    ParentType,
+    ContextType,
+    Partial<CategoryproductsArgs>
+  >;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -405,6 +433,7 @@ export type CollectionListItemResolvers<
     ParentType,
     ContextType
   >;
+  imageUrl?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -421,7 +450,12 @@ export type CollectionResolvers<
     ParentType,
     ContextType
   >;
-  products?: Resolver<ResolversTypes["Products"], ParentType, ContextType>;
+  products?: Resolver<
+    ResolversTypes["Products"],
+    ParentType,
+    ContextType,
+    Partial<CollectionproductsArgs>
+  >;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -489,7 +523,11 @@ export interface Loaders<
     slug?: LoaderResolver<Scalars["String"], Product, {}, TContext>;
     description?: LoaderResolver<Scalars["String"], Product, {}, TContext>;
     price?: LoaderResolver<Scalars["Int"], Product, {}, TContext>;
+    rating?: LoaderResolver<Scalars["Int"], Product, {}, TContext>;
+    inStock?: LoaderResolver<Scalars["Int"], Product, {}, TContext>;
+    variants?: LoaderResolver<Array<Scalars["String"]>, Product, {}, TContext>;
     images?: LoaderResolver<Array<Image>, Product, {}, TContext>;
+    categories?: LoaderResolver<Array<Category>, Product, {}, TContext>;
   };
 
   Image?: {
@@ -527,7 +565,12 @@ export interface Loaders<
       {},
       TContext
     >;
-    products?: LoaderResolver<Products, Category, {}, TContext>;
+    products?: LoaderResolver<
+      Products,
+      Category,
+      CategoryproductsArgs,
+      TContext
+    >;
   };
 
   Categories?: {
@@ -544,6 +587,12 @@ export interface Loaders<
       {},
       TContext
     >;
+    imageUrl?: LoaderResolver<
+      Scalars["String"],
+      CollectionListItem,
+      {},
+      TContext
+    >;
   };
 
   Collection?: {
@@ -556,7 +605,12 @@ export interface Loaders<
       {},
       TContext
     >;
-    products?: LoaderResolver<Products, Collection, {}, TContext>;
+    products?: LoaderResolver<
+      Products,
+      Collection,
+      CollectionproductsArgs,
+      TContext
+    >;
   };
 
   Collections?: {

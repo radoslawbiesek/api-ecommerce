@@ -27,7 +27,9 @@ for (let i = 0; i <= 2; i++) {
 
 const createdCollections: number[] = [];
 for (let i = 0; i <= 3; i++) {
-  const collection = await saveMockCollection({ name: generateUnique() });
+  const response = await fetch("https://picsum.photos/500");
+  const url = response.url;
+  const collection = await saveMockCollection({ name: generateUnique(), imageUrl: url });
   createdCollections.push(collection.id);
 
   console.log(`Created collection (id: ${collection.id}, name: ${collection.name})`);
