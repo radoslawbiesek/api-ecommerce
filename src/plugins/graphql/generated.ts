@@ -39,6 +39,7 @@ export type Query = {
   categories?: Maybe<Categories>;
   collection?: Maybe<Collection>;
   collections?: Maybe<Collections>;
+  cart?: Maybe<Cart>;
 };
 
 export type QueryproductArgs = {
@@ -62,6 +63,10 @@ export type QuerycategoryArgs = {
 
 export type QuerycollectionArgs = {
   slug: Scalars["String"];
+};
+
+export type QuerycartArgs = {
+  id: Scalars["Int"];
 };
 
 export type Product = {
@@ -153,6 +158,55 @@ export type Meta = {
   total: Scalars["Int"];
 };
 
+export type Cart = {
+  __typename?: "Cart";
+  id: Scalars["Int"];
+  items: Array<CartItem>;
+};
+
+export type CartItem = {
+  __typename?: "CartItem";
+  quantity: Scalars["Int"];
+  price?: Maybe<Scalars["Int"]>;
+  productId: Scalars["Int"];
+  variant: Scalars["String"];
+};
+
+export type CardItemInput = {
+  productId: Scalars["Int"];
+  quantity: Scalars["Int"];
+  variant: Scalars["String"];
+};
+
+export type Mutation = {
+  __typename?: "Mutation";
+  cartAddItem: Cart;
+  cartRemoveItem: Cart;
+  cartUpdateItemQuantity: Cart;
+  cartFindOrCreate: Cart;
+};
+
+export type MutationcartAddItemArgs = {
+  cartId: Scalars["Int"];
+  item: CardItemInput;
+};
+
+export type MutationcartRemoveItemArgs = {
+  cartId: Scalars["Int"];
+  productId: Scalars["Int"];
+};
+
+export type MutationcartUpdateItemQuantityArgs = {
+  cartId: Scalars["Int"];
+  productId: Scalars["Int"];
+  quantity: Scalars["Int"];
+};
+
+export type MutationcartFindOrCreateArgs = {
+  id?: InputMaybe<Scalars["Int"]>;
+  input?: InputMaybe<CardItemInput>;
+};
+
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
@@ -231,6 +285,10 @@ export type ResolversTypes = {
   Collection: ResolverTypeWrapper<Collection>;
   Collections: ResolverTypeWrapper<Collections>;
   Meta: ResolverTypeWrapper<Meta>;
+  Cart: ResolverTypeWrapper<Cart>;
+  CartItem: ResolverTypeWrapper<CartItem>;
+  CardItemInput: CardItemInput;
+  Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars["Boolean"]>;
 };
 
@@ -249,6 +307,10 @@ export type ResolversParentTypes = {
   Collection: Collection;
   Collections: Collections;
   Meta: Meta;
+  Cart: Cart;
+  CartItem: CartItem;
+  CardItemInput: CardItemInput;
+  Mutation: {};
   Boolean: Scalars["Boolean"];
 };
 
@@ -283,6 +345,7 @@ export type QueryResolvers<
     RequireFields<QuerycollectionArgs, "slug">
   >;
   collections?: Resolver<Maybe<ResolversTypes["Collections"]>, ParentType, ContextType>;
+  cart?: Resolver<Maybe<ResolversTypes["Cart"]>, ParentType, ContextType, RequireFields<QuerycartArgs, "id">>;
 };
 
 export type ProductResolvers<
@@ -394,6 +457,51 @@ export type MetaResolvers<
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CartResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["Cart"] = ResolversParentTypes["Cart"],
+> = {
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  items?: Resolver<Array<ResolversTypes["CartItem"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CartItemResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["CartItem"] = ResolversParentTypes["CartItem"],
+> = {
+  quantity?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  price?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
+  productId?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  variant?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MutationResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"],
+> = {
+  cartAddItem?: Resolver<
+    ResolversTypes["Cart"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationcartAddItemArgs, "cartId" | "item">
+  >;
+  cartRemoveItem?: Resolver<
+    ResolversTypes["Cart"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationcartRemoveItemArgs, "cartId" | "productId">
+  >;
+  cartUpdateItemQuantity?: Resolver<
+    ResolversTypes["Cart"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationcartUpdateItemQuantityArgs, "cartId" | "productId" | "quantity">
+  >;
+  cartFindOrCreate?: Resolver<ResolversTypes["Cart"], ParentType, ContextType, Partial<MutationcartFindOrCreateArgs>>;
+};
+
 export type Resolvers<ContextType = MercuriusContext> = {
   Query?: QueryResolvers<ContextType>;
   Product?: ProductResolvers<ContextType>;
@@ -406,6 +514,9 @@ export type Resolvers<ContextType = MercuriusContext> = {
   Collection?: CollectionResolvers<ContextType>;
   Collections?: CollectionsResolvers<ContextType>;
   Meta?: MetaResolvers<ContextType>;
+  Cart?: CartResolvers<ContextType>;
+  CartItem?: CartItemResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
 };
 
 export type Loader<TReturn, TObj, TParams, TContext> = (
@@ -497,6 +608,18 @@ export interface Loaders<
 
   Meta?: {
     total?: LoaderResolver<Scalars["Int"], Meta, {}, TContext>;
+  };
+
+  Cart?: {
+    id?: LoaderResolver<Scalars["Int"], Cart, {}, TContext>;
+    items?: LoaderResolver<Array<CartItem>, Cart, {}, TContext>;
+  };
+
+  CartItem?: {
+    quantity?: LoaderResolver<Scalars["Int"], CartItem, {}, TContext>;
+    price?: LoaderResolver<Maybe<Scalars["Int"]>, CartItem, {}, TContext>;
+    productId?: LoaderResolver<Scalars["Int"], CartItem, {}, TContext>;
+    variant?: LoaderResolver<Scalars["String"], CartItem, {}, TContext>;
   };
 }
 declare module "mercurius" {

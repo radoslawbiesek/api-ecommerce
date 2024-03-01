@@ -27,6 +27,23 @@ CREATE TABLE `images_to_products` (
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE TABLE `order_items` (
+	`order_id` integer NOT NULL,
+	`product_id` integer NOT NULL,
+	`quantity` integer NOT NULL,
+	`variant` text,
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	PRIMARY KEY(`order_id`, `product_id`, `variant`),
+	FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE TABLE `orders` (
+	`id` integer PRIMARY KEY NOT NULL,
+	`status` text NOT NULL,
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `product_images` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`product_id` integer,

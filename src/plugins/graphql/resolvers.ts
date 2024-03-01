@@ -4,6 +4,9 @@ import { ProductsRepository } from "repository/products.js";
 import { CategoriesRepository } from "repository/category.js";
 import { CollectionsRepository } from "repository/collections.js";
 import { ProductImagesRepository } from "repository/product-images.js";
+import { OrdersRepository } from "repository/orders.js";
+import { OrderItemsRepository } from "repository/order-items.js";
+import { type OrderItem } from "database/schema.js";
 
 export const resolvers: IResolvers = {
   Query: {
@@ -64,6 +67,17 @@ export const resolvers: IResolvers = {
 
       return { data };
     },
+
+    cart: async function cart(_parent, args: { id: number }, context) {
+      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+
+      const items = await orderItemsRepository.findAll(args.id);
+
+      return {
+        id: args.id,
+        items,
+      };
+    },
   },
 
   Category: {
@@ -109,6 +123,54 @@ export const resolvers: IResolvers = {
       const categoriesRepository = new CategoriesRepository(context.app.db);
 
       return categoriesRepository.findAllByProductId(parent.id);
+    },
+  },
+
+  Mutation: {
+    cartAddItem: async function cartAddItem(
+      _parent,
+      args: { cartId: number; input: { productId: number; quantity: number } },
+      context,
+    ) {
+      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+
+      return orderItemsRepository.addOrUpdate({ ...args.input, orderId: args.cartId });
+    },
+
+    cartRemoveItem: async function cartRemoveItem(_parent, args: { cartId: number; productId: number }, context) {
+      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+
+      return orderItemsRepository.delete(args.cartId, args.productId);
+    },
+
+    cartUpdateItemQuantity: async function cartUpdateItemQuantity(
+      _parent,
+      args: { cartId: number; productId: number; quantity: number },
+      context,
+    ) {
+      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+
+      return orderItemsRepository.update({ ...args, orderId: args.cartId });
+    },
+
+    cartFindOrCreate: async function cartFindOrCreate(
+      _parent,
+      args: { id: number; input?: { productId: number; quantity: number } },
+      context,
+    ) {
+      const ordersRepository = new OrdersRepository(context.app.db);
+      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+
+      const order = await ordersRepository.findOrCreate(args.id);
+      if (args.input) {
+        await orderItemsRepository.addOrUpdate({ ...args.input, orderId: order.id });
+      }
+      const items = await orderItemsRepository.findAll(order.id);
+
+      return {
+        id: order.id,
+        items,
+      };
     },
   },
 };

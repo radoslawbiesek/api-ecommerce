@@ -9,6 +9,7 @@ export const schema = gql`
     categories: Categories
     collection(slug: String!): Collection
     collections: Collections
+    cart(id: Int!): Cart
   }
 
   type Product {
@@ -78,5 +79,33 @@ export const schema = gql`
 
   type Meta {
     total: Int!
+  }
+
+  type Cart {
+    id: Int!
+    items: [CartItem!]!
+  }
+
+  type CartItem {
+    quantity: Int!
+    price: Int
+    productId: Int!
+    variant: String!
+  }
+
+  input CardItemInput {
+    productId: Int!
+    quantity: Int!
+    variant: String!
+  }
+
+  type Mutation {
+    cartAddItem(cartId: Int!, item: CardItemInput!): Cart!
+
+    cartRemoveItem(cartId: Int!, productId: Int!): Cart!
+
+    cartUpdateItemQuantity(cartId: Int!, productId: Int!, quantity: Int!): Cart!
+
+    cartFindOrCreate(id: Int, input: CardItemInput): Cart!
   }
 `;

@@ -91,6 +91,34 @@ export const productsToCollectionsTable = sqliteTable(
   }),
 );
 
+export const ordersTable = sqliteTable("orders", {
+  id: integer("id").primaryKey(),
+  status: text("status").notNull(),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const orderItemsTable = sqliteTable(
+  "order_items",
+  {
+    orderId: integer("order_id")
+      .notNull()
+      .references(() => ordersTable.id),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => productsTable.id),
+    quantity: integer("quantity").notNull(),
+    variant: text("variant"),
+    createdAt: text("created_at")
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.orderId, table.productId, table.variant] }),
+  }),
+);
+
 export type Product = typeof productsTable.$inferSelect;
 export type NewProduct = typeof productsTable.$inferInsert;
 export type Category = typeof categoriesTable.$inferSelect;
@@ -99,3 +127,7 @@ export type ProductImage = typeof productImagesTable.$inferSelect;
 export type NewProductImage = typeof productImagesTable.$inferInsert;
 export type Collection = typeof collectionsTable.$inferSelect;
 export type NewCollection = typeof collectionsTable.$inferInsert;
+export type Order = typeof ordersTable.$inferSelect;
+export type NewOrder = typeof ordersTable.$inferInsert;
+export type OrderItem = typeof orderItemsTable.$inferSelect;
+export type NewOrderItem = typeof orderItemsTable.$inferInsert;
