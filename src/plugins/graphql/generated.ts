@@ -170,6 +170,7 @@ export type CartItem = {
   price?: Maybe<Scalars["Int"]>;
   productId: Scalars["Int"];
   variant: Scalars["String"];
+  product: Product;
 };
 
 export type CardItemInput = {
@@ -474,6 +475,7 @@ export type CartItemResolvers<
   price?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
   productId?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   variant?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  product?: Resolver<ResolversTypes["Product"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -620,6 +622,7 @@ export interface Loaders<
     price?: LoaderResolver<Maybe<Scalars["Int"]>, CartItem, {}, TContext>;
     productId?: LoaderResolver<Scalars["Int"], CartItem, {}, TContext>;
     variant?: LoaderResolver<Scalars["String"], CartItem, {}, TContext>;
+    product?: LoaderResolver<Product, CartItem, {}, TContext>;
   };
 }
 declare module "mercurius" {

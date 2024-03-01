@@ -91,6 +91,7 @@ export const schema = gql`
     price: Int
     productId: Int!
     variant: String!
+    product: Product!
   }
 
   input CardItemInput {

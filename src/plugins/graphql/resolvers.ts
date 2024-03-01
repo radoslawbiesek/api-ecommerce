@@ -6,7 +6,6 @@ import { CollectionsRepository } from "repository/collections.js";
 import { ProductImagesRepository } from "repository/product-images.js";
 import { OrdersRepository } from "repository/orders.js";
 import { OrderItemsRepository } from "repository/order-items.js";
-import { type OrderItem } from "database/schema.js";
 
 export const resolvers: IResolvers = {
   Query: {
@@ -123,6 +122,14 @@ export const resolvers: IResolvers = {
       const categoriesRepository = new CategoriesRepository(context.app.db);
 
       return categoriesRepository.findAllByProductId(parent.id);
+    },
+  },
+
+  CartItem: {
+    product: async function product(parent: { productId: number }, _args, context) {
+      const productsRepository = new ProductsRepository(context.app.db);
+
+      return productsRepository.findById(parent.productId);
     },
   },
 
