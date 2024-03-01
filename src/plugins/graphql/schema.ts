@@ -87,6 +87,7 @@ export const schema = gql`
   }
 
   type CartItem {
+    id: Int!
     quantity: Int!
     price: Int
     productId: Int!
@@ -103,9 +104,9 @@ export const schema = gql`
   type Mutation {
     cartAddItem(cartId: Int!, item: CardItemInput!): Cart!
 
-    cartRemoveItem(cartId: Int!, productId: Int!): Cart!
+    cartRemoveItem(cartItemId: Int!): CartItem!
 
-    cartUpdateItemQuantity(cartId: Int!, productId: Int!, quantity: Int!): Cart!
+    cartUpdateItemQuantity(cartItemId: Int!, quantity: Int!): CartItem!
 
     cartFindOrCreate(id: Int, input: CardItemInput): Cart!
   }

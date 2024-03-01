@@ -144,20 +144,20 @@ export const resolvers: IResolvers = {
       return orderItemsRepository.addOrUpdate({ ...args.input, orderId: args.cartId });
     },
 
-    cartRemoveItem: async function cartRemoveItem(_parent, args: { cartId: number; productId: number }, context) {
+    cartRemoveItem: async function cartRemoveItem(_parent, args: { cartItemId: number }, context) {
       const orderItemsRepository = new OrderItemsRepository(context.app.db);
 
-      return orderItemsRepository.delete(args.cartId, args.productId);
+      return orderItemsRepository.delete(args.cartItemId);
     },
 
     cartUpdateItemQuantity: async function cartUpdateItemQuantity(
       _parent,
-      args: { cartId: number; productId: number; quantity: number },
+      args: { cartItemId: number; quantity: number },
       context,
     ) {
       const orderItemsRepository = new OrderItemsRepository(context.app.db);
 
-      return orderItemsRepository.update({ ...args, orderId: args.cartId });
+      return orderItemsRepository.update(args.cartItemId, { quantity: args.quantity });
     },
 
     cartFindOrCreate: async function cartFindOrCreate(

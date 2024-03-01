@@ -166,6 +166,7 @@ export type Cart = {
 
 export type CartItem = {
   __typename?: "CartItem";
+  id: Scalars["Int"];
   quantity: Scalars["Int"];
   price?: Maybe<Scalars["Int"]>;
   productId: Scalars["Int"];
@@ -182,8 +183,8 @@ export type CardItemInput = {
 export type Mutation = {
   __typename?: "Mutation";
   cartAddItem: Cart;
-  cartRemoveItem: Cart;
-  cartUpdateItemQuantity: Cart;
+  cartRemoveItem: CartItem;
+  cartUpdateItemQuantity: CartItem;
   cartFindOrCreate: Cart;
 };
 
@@ -193,13 +194,11 @@ export type MutationcartAddItemArgs = {
 };
 
 export type MutationcartRemoveItemArgs = {
-  cartId: Scalars["Int"];
-  productId: Scalars["Int"];
+  cartItemId: Scalars["Int"];
 };
 
 export type MutationcartUpdateItemQuantityArgs = {
-  cartId: Scalars["Int"];
-  productId: Scalars["Int"];
+  cartItemId: Scalars["Int"];
   quantity: Scalars["Int"];
 };
 
@@ -471,6 +470,7 @@ export type CartItemResolvers<
   ContextType = MercuriusContext,
   ParentType extends ResolversParentTypes["CartItem"] = ResolversParentTypes["CartItem"],
 > = {
+  id?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   quantity?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
   price?: Resolver<Maybe<ResolversTypes["Int"]>, ParentType, ContextType>;
   productId?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
@@ -490,16 +490,16 @@ export type MutationResolvers<
     RequireFields<MutationcartAddItemArgs, "cartId" | "item">
   >;
   cartRemoveItem?: Resolver<
-    ResolversTypes["Cart"],
+    ResolversTypes["CartItem"],
     ParentType,
     ContextType,
-    RequireFields<MutationcartRemoveItemArgs, "cartId" | "productId">
+    RequireFields<MutationcartRemoveItemArgs, "cartItemId">
   >;
   cartUpdateItemQuantity?: Resolver<
-    ResolversTypes["Cart"],
+    ResolversTypes["CartItem"],
     ParentType,
     ContextType,
-    RequireFields<MutationcartUpdateItemQuantityArgs, "cartId" | "productId" | "quantity">
+    RequireFields<MutationcartUpdateItemQuantityArgs, "cartItemId" | "quantity">
   >;
   cartFindOrCreate?: Resolver<ResolversTypes["Cart"], ParentType, ContextType, Partial<MutationcartFindOrCreateArgs>>;
 };
@@ -618,6 +618,7 @@ export interface Loaders<
   };
 
   CartItem?: {
+    id?: LoaderResolver<Scalars["Int"], CartItem, {}, TContext>;
     quantity?: LoaderResolver<Scalars["Int"], CartItem, {}, TContext>;
     price?: LoaderResolver<Maybe<Scalars["Int"]>, CartItem, {}, TContext>;
     productId?: LoaderResolver<Scalars["Int"], CartItem, {}, TContext>;

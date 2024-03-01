@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, integer, text, primaryKey } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, primaryKey, unique } from "drizzle-orm/sqlite-core";
 
 export const productsTable = sqliteTable("products", {
   id: integer("id").primaryKey(),
@@ -102,6 +102,7 @@ export const ordersTable = sqliteTable("orders", {
 export const orderItemsTable = sqliteTable(
   "order_items",
   {
+    id: integer("id").primaryKey(),
     orderId: integer("order_id")
       .notNull()
       .references(() => ordersTable.id),
@@ -115,7 +116,7 @@ export const orderItemsTable = sqliteTable(
       .notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.orderId, table.productId, table.variant] }),
+    unique: unique().on(table.orderId, table.productId, table.variant),
   }),
 );
 

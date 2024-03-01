@@ -1,4 +1,4 @@
-import { eq, and, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
 import { type OrderItem, type NewOrderItem, orderItemsTable } from "database/schema.js";
@@ -23,23 +23,18 @@ export class OrderItemsRepository {
     return this.db.select().from(orderItemsTable).where(eq(orderItemsTable.orderId, orderId));
   }
 
-  async update(OrderItem: NewOrderItem): Promise<OrderItem> {
+  async update(orderItemId: number, orderItem: Partial<NewOrderItem>): Promise<OrderItem> {
     const result = await this.db
       .update(orderItemsTable)
-      .set(OrderItem)
-      .where(
-        and(eq(orderItemsTable.productId, OrderItem.productId), eq(orderItemsTable.productId, OrderItem.productId)),
-      )
+      .set(orderItem)
+      .where(eq(orderItemsTable.id, orderItemId))
       .returning();
 
     return result[0];
   }
 
-  async delete(cartId: number, productId: number): Promise<OrderItem> {
-    const result = await this.db
-      .delete(orderItemsTable)
-      .where(and(eq(orderItemsTable.productId, cartId), eq(orderItemsTable.productId, productId)))
-      .returning();
+  async delete(orderItemId: number): Promise<OrderItem> {
+    const result = await this.db.delete(orderItemsTable).where(eq(orderItemsTable.id, orderItemId)).returning();
 
     return result[0];
   }
