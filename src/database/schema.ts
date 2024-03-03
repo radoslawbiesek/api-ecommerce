@@ -115,7 +115,9 @@ export const reviewsTable = sqliteTable("reviews", {
   rating: real("rating").notNull(),
   name: text("name").notNull(),
   email: text("email").notNull(),
-  createdAt: text("created_at"),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
 
 export type Product = typeof productsTable.$inferSelect;
