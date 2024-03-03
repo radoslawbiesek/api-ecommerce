@@ -1,9 +1,16 @@
 import { faker } from "@faker-js/faker";
 
-import { saveMockCategory, saveMockCollection, saveMockProduct, saveMockProductImage } from "tests/mock.js";
+import { generateMockCategory, generateMockCollection, generateMockProduct } from "tests/mock.js";
 
 import { db, sqlite } from "./client.js";
-import { imagesToProductsTable, productsToCategoriesTable, productsToCollectionsTable } from "./schema.js";
+import { CategoriesRepository } from "./categories/categories.repository.js";
+import { CollectionsRepository } from "./collections/collections.repository.js";
+import { ProductsRepository } from "./products/products.repository.js";
+import { productsToCategoriesTable, productsToCollectionsTable } from "./schema.js";
+
+const categoriesRepository = new CategoriesRepository(db);
+const collectionsRepository = new CollectionsRepository(db);
+const productsRepository = new ProductsRepository(db);
 
 const generated = new Set<string>();
 
@@ -19,7 +26,7 @@ function generateUnique(): string {
 
 const createdCategories: number[] = [];
 for (let i = 0; i <= 2; i++) {
-  const category = await saveMockCategory({ name: generateUnique() });
+  const category = await categoriesRepository.create(generateMockCategory({ name: generateUnique() }));
   createdCategories.push(category.id);
 
   console.log(`Created category (id: ${category.id}, name: ${category.name})`);
@@ -27,27 +34,36 @@ for (let i = 0; i <= 2; i++) {
 
 const createdCollections: number[] = [];
 for (let i = 0; i <= 3; i++) {
-  const response = await fetch("https://picsum.photos/500");
-  const url = response.url;
-  const collection = await saveMockCollection({ name: generateUnique(), imageUrl: url });
+  let url = "https://picsum.photos/500";
+  try {
+    const response = await fetch("https://picsum.photos/500");
+    url = response.url;
+  } catch {}
+
+  const collection = await collectionsRepository.create(
+    generateMockCollection({ name: generateUnique(), imageUrl: url }),
+  );
   createdCollections.push(collection.id);
 
   console.log(`Created collection (id: ${collection.id}, name: ${collection.name})`);
 }
 
-for (let i = 0; i < 100; i++) {
-  const product = await saveMockProduct();
-
-  const productImagesIds: number[] = [];
-  for (let i = 0; i < 3; i++) {
+for (let i = 0; i < 40; i++) {
+  const product = await productsRepository.create(generateMockProduct({ name: faker.commerce.productName() }));
+  let productUrl = "https://picsum.photos/500";
+  try {
     const response = await fetch("https://picsum.photos/500");
-    const url = response.url;
-    const productImage = await saveMockProductImage({ url, productId: product.id });
-    productImagesIds.push(productImage.id);
-    console.log(`Created product image (id: ${productImage.id}, url: ${productImage.url})`);
-  }
+    productUrl = response.url;
+  } catch (err) {}
 
-  await db.insert(imagesToProductsTable).values(productImagesIds.map((id) => ({ productId: product.id, imageId: id })));
+  const productImage = await productsRepository.addImage(product.id, {
+    url: productUrl,
+    width: 500,
+    height: 500,
+    alt: "",
+  });
+  console.log(`Created product image (id: ${productImage.id}, url: ${productImage.url})`);
+
   await db.insert(productsToCategoriesTable).values({ productId: product.id, categoryId: createdCategories[i % 3] });
   await db
     .insert(productsToCollectionsTable)

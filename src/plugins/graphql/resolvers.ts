@@ -1,11 +1,10 @@
 import { type IResolvers } from "mercurius";
 
-import { ProductsRepository } from "repository/products.js";
-import { CategoriesRepository } from "repository/category.js";
-import { CollectionsRepository } from "repository/collections.js";
-import { ProductImagesRepository } from "repository/product-images.js";
-import { OrdersRepository } from "repository/orders.js";
-import { OrderItemsRepository } from "repository/order-items.js";
+import { ProductsRepository } from "database/products/products.repository.js";
+import { CategoriesRepository } from "database/categories/categories.repository.js";
+import { CollectionsRepository } from "database/collections/collections.repository.js";
+import { OrdersRepository } from "database/orders/orders.repository.js";
+import { ReviewsRepository } from "database/reviews/reviews.repository.js";
 
 export const resolvers: IResolvers = {
   Query: {
@@ -36,7 +35,7 @@ export const resolvers: IResolvers = {
     ) {
       const productsRepository = new ProductsRepository(context.app.db);
 
-      const data = productsRepository.findRecommendedProducts(args.productId, args);
+      const data = productsRepository.findAllRecommended(args.productId, args);
 
       return { data };
     },
@@ -68,23 +67,24 @@ export const resolvers: IResolvers = {
     },
 
     cart: async function cart(_parent, args: { id: number }, context) {
-      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+      const ordersRepository = new OrdersRepository(context.app.db);
 
-      const items = await orderItemsRepository.findAll(args.id);
+      return ordersRepository.findById(args.id);
+    },
 
-      return {
-        id: args.id,
-        items,
-      };
+    reviews: async function reviews(_parent, args: { productId: number }, context) {
+      const reviewsRepository = new ReviewsRepository(context.app.db);
+
+      return reviewsRepository.findAll(args.productId);
     },
   },
 
   Category: {
     products: async function products(parent: { id: number }, args: { take?: number; skip?: number }, context) {
-      const productsRepository = new ProductsRepository(context.app.db);
+      const categoriesRepository = new CategoriesRepository(context.app.db);
 
-      const data = await productsRepository.findAllByCategoryId(parent.id, args);
-      const total = await productsRepository.countAllByCategoryId(parent.id);
+      const data = await categoriesRepository.findAllProducts(parent.id, args);
+      const total = await categoriesRepository.countAllProducts(parent.id);
 
       return {
         data,
@@ -97,10 +97,10 @@ export const resolvers: IResolvers = {
 
   Collection: {
     products: async function products(parent: { id: number }, args: { take?: number; skip?: number }, context) {
-      const productsRepository = new ProductsRepository(context.app.db);
+      const collectionsRepository = new CollectionsRepository(context.app.db);
 
-      const data = await productsRepository.findAllByCollectionId(parent.id, args);
-      const total = await productsRepository.countAllByCollectionId(parent.id);
+      const data = await collectionsRepository.findAllProducts(parent.id, args);
+      const total = await collectionsRepository.countAllProducts(parent.id);
 
       return {
         data,
@@ -113,9 +113,9 @@ export const resolvers: IResolvers = {
 
   Product: {
     images: async function images(parent: { id: number }, _args, context) {
-      const productImagesRepository = new ProductImagesRepository(context.app.db);
+      const productsRepository = new ProductsRepository(context.app.db);
 
-      return productImagesRepository.findAllByProductId(parent.id);
+      return productsRepository.findImages(parent.id);
     },
 
     categories: async function categories(parent: { id: number }, _args, context) {
@@ -139,15 +139,15 @@ export const resolvers: IResolvers = {
       args: { cartId: number; input: { productId: number; quantity: number } },
       context,
     ) {
-      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+      const ordersRepository = new OrdersRepository(context.app.db);
 
-      return orderItemsRepository.addOrUpdate({ ...args.input, orderId: args.cartId });
+      return ordersRepository.addItem({ ...args.input, orderId: args.cartId });
     },
 
     cartRemoveItem: async function cartRemoveItem(_parent, args: { cartItemId: number }, context) {
-      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+      const ordersRepository = new OrdersRepository(context.app.db);
 
-      return orderItemsRepository.delete(args.cartItemId);
+      return ordersRepository.deleteItem(args.cartItemId);
     },
 
     cartUpdateItemQuantity: async function cartUpdateItemQuantity(
@@ -155,9 +155,9 @@ export const resolvers: IResolvers = {
       args: { cartItemId: number; quantity: number },
       context,
     ) {
-      const orderItemsRepository = new OrderItemsRepository(context.app.db);
+      const ordersRepository = new OrdersRepository(context.app.db);
 
-      return orderItemsRepository.update(args.cartItemId, { quantity: args.quantity });
+      return ordersRepository.updateItem({ id: args.cartItemId, quantity: args.quantity });
     },
 
     cartFindOrCreate: async function cartFindOrCreate(
@@ -166,18 +166,30 @@ export const resolvers: IResolvers = {
       context,
     ) {
       const ordersRepository = new OrdersRepository(context.app.db);
-      const orderItemsRepository = new OrderItemsRepository(context.app.db);
 
-      const order = await ordersRepository.findOrCreate(args.id);
-      if (args.input) {
-        await orderItemsRepository.addOrUpdate({ ...args.input, orderId: order.id });
+      let cart = await ordersRepository.findById(args.id);
+      if (!cart) {
+        cart = await ordersRepository.create();
       }
-      const items = await orderItemsRepository.findAll(order.id);
 
-      return {
-        id: order.id,
-        items,
-      };
+      if (args.input) {
+        const item = await ordersRepository.addItem({ ...args.input, orderId: cart.id });
+        cart.items.push(item);
+      }
+
+      return cart;
+    },
+
+    addReview: async function addReview(
+      _parent,
+      args: {
+        input: { productId: number; rating: number; content: string; title: string; name: string; email: string };
+      },
+      context,
+    ) {
+      const reviewsRepository = new ReviewsRepository(context.app.db);
+
+      return reviewsRepository.create(args.input);
     },
   },
 };

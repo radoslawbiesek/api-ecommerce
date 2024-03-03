@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, integer, text, primaryKey, unique } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, primaryKey, unique, real } from "drizzle-orm/sqlite-core";
 
 export const productsTable = sqliteTable("products", {
   id: integer("id").primaryKey(),
@@ -7,20 +7,9 @@ export const productsTable = sqliteTable("products", {
   slug: text("slug").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(),
-  rating: integer("rating"),
+  rating: real("rating"),
   variants: text("variants"),
   inStock: integer("in_stock").default(1).notNull(),
-  createdAt: text("created_at")
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: text("updated_at"),
-});
-
-export const categoriesTable = sqliteTable("categories", {
-  id: integer("id").primaryKey(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull(),
-  description: text("description"),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -36,6 +25,17 @@ export const productImagesTable = sqliteTable("product_images", {
   width: integer("width").notNull(),
 });
 
+export const categoriesTable = sqliteTable("categories", {
+  id: integer("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull(),
+  description: text("description"),
+  createdAt: text("created_at")
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: text("updated_at"),
+});
+
 export const collectionsTable = sqliteTable("collections", {
   id: integer("id").primaryKey(),
   name: text("name").notNull(),
@@ -47,21 +47,6 @@ export const collectionsTable = sqliteTable("collections", {
     .notNull(),
   updatedAt: text("updated_at"),
 });
-
-export const imagesToProductsTable = sqliteTable(
-  "images_to_products",
-  {
-    imageId: integer("image_id").references(() => productImagesTable.id),
-    productId: integer("product_id").references(() => productsTable.id),
-    createdAt: text("created_at")
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: text("updated_at"),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.imageId, table.productId] }),
-  }),
-);
 
 export const productsToCategoriesTable = sqliteTable(
   "products_to_categories",
@@ -120,6 +105,19 @@ export const orderItemsTable = sqliteTable(
   }),
 );
 
+export const reviewsTable = sqliteTable("reviews", {
+  id: integer("id").primaryKey(),
+  productId: integer("product_id")
+    .references(() => productsTable.id)
+    .notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  rating: real("rating").notNull(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  createdAt: text("created_at"),
+});
+
 export type Product = typeof productsTable.$inferSelect;
 export type NewProduct = typeof productsTable.$inferInsert;
 export type Category = typeof categoriesTable.$inferSelect;
@@ -132,3 +130,5 @@ export type Order = typeof ordersTable.$inferSelect;
 export type NewOrder = typeof ordersTable.$inferInsert;
 export type OrderItem = typeof orderItemsTable.$inferSelect;
 export type NewOrderItem = typeof orderItemsTable.$inferInsert;
+export type Review = typeof reviewsTable.$inferSelect;
+export type NewReview = typeof reviewsTable.$inferInsert;

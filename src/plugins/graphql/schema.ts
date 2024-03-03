@@ -10,6 +10,7 @@ export const schema = gql`
     collection(slug: String!): Collection
     collections: Collections
     cart(id: Int!): Cart
+    reviews(productId: Int!): [Review!]!
   }
 
   type Product {
@@ -18,7 +19,7 @@ export const schema = gql`
     slug: String!
     description: String!
     price: Int!
-    rating: Int!
+    rating: Float
     inStock: Int!
     variants: [String!]!
     images: [Image!]!
@@ -101,6 +102,26 @@ export const schema = gql`
     variant: String!
   }
 
+  type Review {
+    id: Int!
+    productId: Int!
+    rating: Int!
+    title: String!
+    content: String!
+    name: String!
+    email: String!
+    createdAt: String!
+  }
+
+  input ReviewInput {
+    productId: Int!
+    rating: Int!
+    title: String!
+    content: String!
+    name: String!
+    email: String!
+  }
+
   type Mutation {
     cartAddItem(cartId: Int!, item: CardItemInput!): Cart!
 
@@ -109,5 +130,7 @@ export const schema = gql`
     cartUpdateItemQuantity(cartItemId: Int!, quantity: Int!): CartItem!
 
     cartFindOrCreate(id: Int, input: CardItemInput): Cart!
+
+    addReview(input: ReviewInput!): Review!
   }
 `;

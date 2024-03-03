@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import { DefaultLogger } from "drizzle-orm";
 
-import * as schema from "../../database/schema.js";
+import * as schema from "database/schema.js";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -24,8 +24,9 @@ export const database: FastifyPluginAsync = async (fastify) => {
   });
 
   const db = drizzle(sqlite, { schema, logger });
+
   fastify.decorate("db", db);
-  fastify.addHook("onClose", (instance, done) => {
+  fastify.addHook("onClose", (_instance, done) => {
     sqlite.close();
     done();
   });

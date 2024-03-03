@@ -1,26 +1,20 @@
 import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { type SQL, and, count, eq, like, or, not, desc } from "drizzle-orm";
 
+import { type ListParams } from "database/common/types.js";
+import { DEFAULT_SKIP, DEFAULT_TAKE } from "database/common/constants.js";
 import {
   type NewProduct,
   type Product,
+  type ProductImage,
+  productImagesTable,
   productsTable,
-  productsToCollectionsTable,
-  productsToCategoriesTable,
+  NewProductImage,
 } from "database/schema.js";
 
-const DEFAULT_TAKE = 10;
-const DEFAULT_SKIP = 0;
+export type ProductWithVariants = Omit<Product, "variants"> & { variants: string[] };
 
-type ListParams = {
-  take?: number;
-  skip?: number;
-  search?: string;
-};
-
-type ProductWithVariants = Omit<Product, "variants"> & { variants: string[] };
-
-function parseVariants(product: Product): ProductWithVariants {
+export function parseVariants(product: Product): ProductWithVariants {
   let variants: string[] = [];
   if (product.variants) {
     try {
@@ -82,52 +76,7 @@ export class ProductsRepository {
     return result[0].value;
   }
 
-  async findAllByCategoryId(
-    categoryId: number,
-    { take = DEFAULT_TAKE, skip = DEFAULT_SKIP }: ListParams,
-  ): Promise<ProductWithVariants[]> {
-    const result = await this.db
-      .select()
-      .from(productsToCategoriesTable)
-      .where(eq(productsToCategoriesTable.categoryId, categoryId))
-      .leftJoin(productsTable, eq(productsToCategoriesTable.productId, productsTable.id))
-      .limit(take)
-      .offset(skip);
-
-    return result
-      .map((r) => r.products)
-      .filter((v): v is Product => !!v)
-      .map(parseVariants);
-  }
-
-  async countAllByCategoryId(categoryId: number): Promise<number> {
-    const result = await this.db
-      .select({ value: count() })
-      .from(productsToCategoriesTable)
-      .where(eq(productsToCategoriesTable.categoryId, categoryId));
-
-    return result[0].value;
-  }
-
-  async findAllByCollectionId(
-    collectionId: number,
-    { take = DEFAULT_TAKE, skip = DEFAULT_SKIP }: ListParams,
-  ): Promise<ProductWithVariants[]> {
-    const result = await this.db
-      .select()
-      .from(productsToCollectionsTable)
-      .where(eq(productsToCollectionsTable.collectionId, collectionId))
-      .leftJoin(productsTable, eq(productsToCollectionsTable.productId, productsTable.id))
-      .limit(take)
-      .offset(skip);
-
-    return result
-      .map((r) => r.products)
-      .filter((v): v is Product => !!v)
-      .map(parseVariants);
-  }
-
-  async findRecommendedProducts(
+  async findAllRecommended(
     productId: number,
     { take = DEFAULT_TAKE }: { take?: number },
   ): Promise<ProductWithVariants[]> {
@@ -141,13 +90,19 @@ export class ProductsRepository {
     return result.map(parseVariants);
   }
 
-  async countAllByCollectionId(collectionId: number): Promise<number> {
-    const result = await this.db
-      .select({ value: count() })
-      .from(productsToCollectionsTable)
-      .where(eq(productsToCollectionsTable.collectionId, collectionId));
+  async findImages(productId: number): Promise<ProductImage[]> {
+    const result = await this.db.select().from(productImagesTable).where(eq(productImagesTable.productId, productId));
 
-    return result[0].value;
+    return result;
+  }
+
+  async addImage(productId: number, image: NewProductImage): Promise<ProductImage> {
+    const result = await this.db
+      .insert(productImagesTable)
+      .values({ ...image, productId })
+      .returning();
+
+    return result[0];
   }
 
   async create(product: NewProduct): Promise<Product> {
