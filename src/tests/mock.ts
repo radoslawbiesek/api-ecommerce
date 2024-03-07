@@ -9,6 +9,8 @@ import {
   type NewProductImage,
   type Collection,
   type ProductImage,
+  type NewReview,
+  type Review,
   categoriesTable,
   productsTable,
   productImagesTable,
@@ -24,7 +26,7 @@ export function generateMockProduct(overrides: Partial<NewProduct> = {}): NewPro
     slug: faker.helpers.slugify(name).toLowerCase(),
     description: faker.commerce.productDescription(),
     price: parseInt(faker.commerce.price({ min: 100, max: 1000 })),
-    rating: faker.number.int({ min: 1, max: 5 }),
+    rating: null,
     variants: JSON.stringify(Array.from({ length: 3 }, () => faker.commerce.productMaterial())),
     inStock: faker.number.int({ min: 0, max: 100 }),
     ...overrides,
@@ -99,4 +101,16 @@ export async function saveMockProductImage(overrides: Partial<NewProductImage> =
   const result = await db.insert(productImagesTable).values(image).returning();
 
   return result[0];
+}
+
+export function generateMockReview(overrides?: Partial<NewReview>): Review {
+  return {
+    name: faker.person.firstName(),
+    email: faker.internet.email(),
+    rating: faker.number.int({ min: 1, max: 5 }),
+    headline: faker.lorem.sentence(),
+    content: faker.lorem.paragraph(),
+    productId: 1,
+    ...overrides,
+  };
 }

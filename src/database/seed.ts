@@ -1,16 +1,18 @@
 import { faker } from "@faker-js/faker";
 
-import { generateMockCategory, generateMockCollection, generateMockProduct } from "tests/mock.js";
+import { generateMockCategory, generateMockCollection, generateMockProduct, generateMockReview } from "tests/mock.js";
 
 import { db, sqlite } from "./client.js";
 import { CategoriesRepository } from "./categories/categories.repository.js";
 import { CollectionsRepository } from "./collections/collections.repository.js";
 import { ProductsRepository } from "./products/products.repository.js";
 import { productsToCategoriesTable, productsToCollectionsTable } from "./schema.js";
+import { ReviewsRepository } from "./reviews/reviews.repository.js";
 
 const categoriesRepository = new CategoriesRepository(db);
 const collectionsRepository = new CollectionsRepository(db);
 const productsRepository = new ProductsRepository(db);
+const reviewsRepository = new ReviewsRepository(db);
 
 const generated = new Set<string>();
 
@@ -70,6 +72,11 @@ for (let i = 0; i < 40; i++) {
     .values({ productId: product.id, collectionId: createdCollections[i % 3] });
 
   console.log(`Created product (id: ${product.id}, name: ${product.name})`);
+
+  for (let j = 0; j < 5; j++) {
+    const review = await reviewsRepository.create(generateMockReview({ productId: product.id }));
+    console.log(`Created review (id: ${review.id}, productId: ${review.productId})`);
+  }
 }
 
 sqlite.close();

@@ -3,15 +3,14 @@ import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
 import { DEFAULT_SKIP, DEFAULT_TAKE } from "database/common/constants.js";
 import { type ListParams } from "database/common/types.js";
-import { parseVariants, type ProductWithVariants } from "database/products/products.repository.js";
 import {
-  type Product,
   productsTable,
   type Category,
   type NewCategory,
   categoriesTable,
   productsToCategoriesTable,
 } from "database/schema.js";
+import { parseVariants, type ProductWithVariants, getOrdering } from "database/products/products.helpers.js";
 
 export class CategoriesRepository {
   constructor(private readonly db: BetterSQLite3Database) {}
@@ -24,16 +23,10 @@ export class CategoriesRepository {
     const result = await this.db
       .select()
       .from(productsToCategoriesTable)
-      .leftJoin(categoriesTable, eq(categoriesTable.id, productsToCategoriesTable.categoryId))
+      .innerJoin(categoriesTable, eq(categoriesTable.id, productsToCategoriesTable.categoryId))
       .where(eq(productsToCategoriesTable.productId, productId));
 
-    return result.map((r) => r.categories).filter((v): v is Category => !!v);
-  }
-
-  async findById(id: number): Promise<Category | undefined> {
-    const result = await this.db.select().from(categoriesTable).where(eq(categoriesTable.id, id));
-
-    return result[0];
+    return result.map((r) => r.categories);
   }
 
   async findBySlug(slug: string): Promise<Category | undefined> {
@@ -44,20 +37,18 @@ export class CategoriesRepository {
 
   async findAllProducts(
     categoryId: number,
-    { take = DEFAULT_TAKE, skip = DEFAULT_SKIP }: ListParams,
+    { take = DEFAULT_TAKE, skip = DEFAULT_SKIP, ordering }: ListParams,
   ): Promise<ProductWithVariants[]> {
     const result = await this.db
       .select()
       .from(productsToCategoriesTable)
       .where(eq(productsToCategoriesTable.categoryId, categoryId))
-      .leftJoin(productsTable, eq(productsToCategoriesTable.productId, productsTable.id))
+      .innerJoin(productsTable, eq(productsToCategoriesTable.productId, productsTable.id))
+      .orderBy(getOrdering(ordering))
       .limit(take)
       .offset(skip);
 
-    return result
-      .map((r) => r.products)
-      .filter((v): v is Product => !!v)
-      .map(parseVariants);
+    return result.map((r) => parseVariants(r.products));
   }
 
   async countAllProducts(categoryId: number): Promise<number> {
@@ -66,23 +57,19 @@ export class CategoriesRepository {
       .from(productsToCategoriesTable)
       .where(eq(productsToCategoriesTable.categoryId, categoryId));
 
+    if (!result[0]) {
+      throw new Error("Failed to count products");
+    }
+
     return result[0].value;
   }
 
   async create(product: NewCategory): Promise<Category> {
     const result = await this.db.insert(categoriesTable).values(product).returning();
 
-    return result[0];
-  }
-
-  async update(id: number, product: NewCategory): Promise<Category> {
-    const result = await this.db.update(categoriesTable).set(product).where(eq(categoriesTable.id, id)).returning();
-
-    return result[0];
-  }
-
-  async delete(id: number): Promise<Category> {
-    const result = await this.db.delete(categoriesTable).where(eq(categoriesTable.id, id)).returning();
+    if (!result[0]) {
+      throw new Error("Failed to create category");
+    }
 
     return result[0];
   }

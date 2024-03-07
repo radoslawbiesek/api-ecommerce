@@ -10,7 +10,8 @@
       "plugins/*": ["./src/plugins/*"],
       "repository/*": ["./src/repository/*"],
       "tests/*": ["./src/tests/*"]
-    }
+    },
+    "noUncheckedIndexedAccess": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules/**/*", "src/plugins/graphql/generated.ts", "dist/**/*"]

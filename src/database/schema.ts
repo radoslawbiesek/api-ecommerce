@@ -110,7 +110,7 @@ export const reviewsTable = sqliteTable("reviews", {
   productId: integer("product_id")
     .references(() => productsTable.id)
     .notNull(),
-  title: text("title").notNull(),
+  headline: text("title").notNull(),
   content: text("content").notNull(),
   rating: real("rating").notNull(),
   name: text("name").notNull(),

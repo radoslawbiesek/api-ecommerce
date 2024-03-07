@@ -9,24 +9,9 @@ import {
   type ProductImage,
   productImagesTable,
   productsTable,
-  NewProductImage,
+  type NewProductImage,
 } from "database/schema.js";
-
-export type ProductWithVariants = Omit<Product, "variants"> & { variants: string[] };
-
-export function parseVariants(product: Product): ProductWithVariants {
-  let variants: string[] = [];
-  if (product.variants) {
-    try {
-      variants = JSON.parse(product.variants) as string[];
-    } catch {}
-  }
-
-  return {
-    ...product,
-    variants,
-  };
-}
+import { parseVariants, type ProductWithVariants, getOrdering } from "database/products/products.helpers.js";
 
 export class ProductsRepository {
   constructor(private readonly db: BetterSQLite3Database) {}
@@ -43,7 +28,7 @@ export class ProductsRepository {
     return result.map(parseVariants)[0];
   }
 
-  #getFilters({ search }: { search?: string }): SQL[] {
+  #getFilters(search?: string): SQL[] {
     const filters: SQL[] = [];
     if (search) {
       const searchTerm = `%${search.toLowerCase()}%`;
@@ -56,11 +41,14 @@ export class ProductsRepository {
     return filters;
   }
 
-  async findAll({ take = DEFAULT_TAKE, skip = DEFAULT_SKIP, search }: ListParams = {}): Promise<ProductWithVariants[]> {
+  async findAll({ take = DEFAULT_TAKE, skip = DEFAULT_SKIP, search, ordering }: ListParams = {}): Promise<
+    ProductWithVariants[]
+  > {
     const result = await this.db
       .select()
       .from(productsTable)
-      .where(and(...this.#getFilters({ search })))
+      .where(and(...this.#getFilters(search)))
+      .orderBy(getOrdering(ordering))
       .limit(take)
       .offset(skip);
 
@@ -71,7 +59,11 @@ export class ProductsRepository {
     const result = await this.db
       .select({ value: count() })
       .from(productsTable)
-      .where(and(...this.#getFilters({ search })));
+      .where(and(...this.#getFilters(search)));
+
+    if (!result[0]) {
+      throw new Error("Failed to count products");
+    }
 
     return result[0].value;
   }
@@ -91,9 +83,7 @@ export class ProductsRepository {
   }
 
   async findImages(productId: number): Promise<ProductImage[]> {
-    const result = await this.db.select().from(productImagesTable).where(eq(productImagesTable.productId, productId));
-
-    return result;
+    return this.db.select().from(productImagesTable).where(eq(productImagesTable.productId, productId));
   }
 
   async addImage(productId: number, image: NewProductImage): Promise<ProductImage> {
@@ -102,23 +92,19 @@ export class ProductsRepository {
       .values({ ...image, productId })
       .returning();
 
+    if (!result[0]) {
+      throw new Error("Failed to add image");
+    }
+
     return result[0];
   }
 
   async create(product: NewProduct): Promise<Product> {
     const result = await this.db.insert(productsTable).values(product).returning();
 
-    return result[0];
-  }
-
-  async update(id: number, product: NewProduct): Promise<Product> {
-    const result = await this.db.update(productsTable).set(product).where(eq(productsTable.id, id)).returning();
-
-    return result[0];
-  }
-
-  async delete(id: number): Promise<Product> {
-    const result = await this.db.delete(productsTable).where(eq(productsTable.id, id)).returning();
+    if (!result[0]) {
+      throw new Error("Failed to create product");
+    }
 
     return result[0];
   }

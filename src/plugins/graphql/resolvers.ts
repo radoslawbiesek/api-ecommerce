@@ -183,7 +183,7 @@ export const resolvers: IResolvers = {
     addReview: async function addReview(
       _parent,
       args: {
-        input: { productId: number; rating: number; content: string; title: string; name: string; email: string };
+        input: { productId: number; rating: number; content: string; headline: string; name: string; email: string };
       },
       context,
     ) {
