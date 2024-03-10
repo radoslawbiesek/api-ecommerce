@@ -180,6 +180,12 @@ export const resolvers: IResolvers = {
       return cart;
     },
 
+    orderUpdateStatus: async function orderUpdateStatus(_parent, args: { id: number; status: string }, context) {
+      const ordersRepository = new OrdersRepository(context.app.db);
+
+      return ordersRepository.update(args.id, { status: args.status });
+    },
+
     addReview: async function addReview(
       _parent,
       args: {

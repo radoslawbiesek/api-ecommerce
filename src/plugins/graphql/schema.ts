@@ -87,6 +87,12 @@ export const schema = gql`
     items: [CartItem!]!
   }
 
+  type Order {
+    id: Int!
+    items: [CartItem!]!
+    status: String
+  }
+
   type CartItem {
     id: Int!
     quantity: Int!
@@ -130,6 +136,8 @@ export const schema = gql`
     cartUpdateItemQuantity(cartItemId: Int!, quantity: Int!): CartItem!
 
     cartFindOrCreate(id: Int, input: CardItemInput): Cart!
+
+    orderUpdateStatus(id: Int, status: String): Order
 
     addReview(input: ReviewInput!): Review!
   }

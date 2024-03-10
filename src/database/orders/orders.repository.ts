@@ -82,4 +82,14 @@ export class OrdersRepository {
 
     return result[0];
   }
+
+  async update(id: number, order: Partial<Order>): Promise<Order> {
+    const result = await this.db.update(ordersTable).set(order).where(eq(ordersTable.id, id)).returning();
+
+    if (!result[0]) {
+      throw new Error("Failed to update order");
+    }
+
+    return result[0];
+  }
 }
