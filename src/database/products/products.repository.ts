@@ -1,8 +1,7 @@
-import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { type SQL, and, count, eq, like, or, not, desc } from "drizzle-orm";
 
-import { type ListParams } from "database/common/types.js";
-import { DEFAULT_SKIP, DEFAULT_TAKE } from "database/common/constants.js";
+import { type ListParams } from "../common/types.js";
+import { DEFAULT_SKIP, DEFAULT_TAKE } from "../common/constants.js";
 import {
   type NewProduct,
   type Product,
@@ -10,11 +9,12 @@ import {
   productImagesTable,
   productsTable,
   type NewProductImage,
-} from "database/schema.js";
-import { parseVariants, type ProductWithVariants, getOrdering } from "database/products/products.helpers.js";
+} from "../schema.js";
+import { parseVariants, type ProductWithVariants, getOrdering } from "../products/products.helpers.js";
+import { type Db } from "../client.js";
 
 export class ProductsRepository {
-  constructor(private readonly db: BetterSQLite3Database) {}
+  constructor(private readonly db: Db) {}
 
   async findById(id: number): Promise<ProductWithVariants | undefined> {
     const result = await this.db.select().from(productsTable).where(eq(productsTable.id, id));

@@ -1,7 +1,11 @@
 import { faker } from "@faker-js/faker";
 
-import { generateMockCategory, generateMockCollection, generateMockProduct, generateMockReview } from "tests/mock.js";
-
+import {
+  generateMockCategory,
+  generateMockCollection,
+  generateMockProduct,
+  generateMockReview,
+} from "../tests/mock.js";
 import { db, sqlite } from "./client.js";
 import { CategoriesRepository } from "./categories/categories.repository.js";
 import { CollectionsRepository } from "./collections/collections.repository.js";

@@ -4,11 +4,12 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import { DefaultLogger } from "drizzle-orm";
 
-import * as schema from "database/schema.js";
+import * as schema from "../../database/schema.js";
+import { type Db } from "../../database/client.js";
 
 declare module "fastify" {
   interface FastifyInstance {
-    db: ReturnType<typeof drizzle>;
+    db: Db;
   }
 }
 

@@ -1,12 +1,12 @@
-import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { eq, sql } from "drizzle-orm";
 
-import { type Order, ordersTable, type NewOrderItem, type OrderItem, orderItemsTable } from "database/schema.js";
+import { type Order, ordersTable, type NewOrderItem, type OrderItem, orderItemsTable } from "../schema.js";
+import { type Db } from "../client.js";
 
 type OrderWithItems = Order & { items: OrderItem[] };
 
 export class OrdersRepository {
-  constructor(private readonly db: BetterSQLite3Database) {}
+  constructor(private readonly db: Db) {}
 
   async findById(id: number): Promise<OrderWithItems | undefined> {
     const result = await this.db

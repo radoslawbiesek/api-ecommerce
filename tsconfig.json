@@ -5,13 +5,8 @@
     "outDir": "dist",
     "declaration": false,
     "sourceMap": true,
-    "paths": {
-      "database/*": ["./src/database/*"],
-      "plugins/*": ["./src/plugins/*"],
-      "repository/*": ["./src/repository/*"],
-      "tests/*": ["./src/tests/*"]
-    },
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "target": "esnext"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules/**/*", "src/plugins/graphql/generated.ts", "dist/**/*"]

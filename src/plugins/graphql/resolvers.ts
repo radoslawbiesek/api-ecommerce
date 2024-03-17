@@ -1,10 +1,10 @@
 import { type IResolvers } from "mercurius";
 
-import { ProductsRepository } from "database/products/products.repository.js";
-import { CategoriesRepository } from "database/categories/categories.repository.js";
-import { CollectionsRepository } from "database/collections/collections.repository.js";
-import { OrdersRepository } from "database/orders/orders.repository.js";
-import { ReviewsRepository } from "database/reviews/reviews.repository.js";
+import { ProductsRepository } from "../../database/products/products.repository.js";
+import { CategoriesRepository } from "../../database/categories/categories.repository.js";
+import { CollectionsRepository } from "../../database/collections/collections.repository.js";
+import { OrdersRepository } from "../../database/orders/orders.repository.js";
+import { ReviewsRepository } from "../../database/reviews/reviews.repository.js";
 
 export const resolvers: IResolvers = {
   Query: {

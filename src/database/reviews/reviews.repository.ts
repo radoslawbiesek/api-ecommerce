@@ -1,10 +1,10 @@
-import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { avg, desc, eq } from "drizzle-orm";
 
-import { reviewsTable, type Review, type NewReview, productsTable } from "database/schema.js";
+import { reviewsTable, type Review, type NewReview, productsTable } from "../schema.js";
+import { type Db } from "../client.js";
 
 export class ReviewsRepository {
-  constructor(private readonly db: BetterSQLite3Database) {}
+  constructor(private readonly db: Db) {}
 
   async findAll(productId: number): Promise<Review[]> {
     return this.db

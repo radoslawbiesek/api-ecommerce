@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node --import tsx --env-file=.env --watch src/server.ts",
     "build": "rimraf dist && tsc",
+    "start": "node --env-file=.env dist/server.js",
     "lint": "eslint --fix",
     "format": "prettier --write .",
     "db:generate-migrations": "drizzle-kit generate:sqlite",

@@ -15,8 +15,8 @@ import {
   productsTable,
   productImagesTable,
   collectionsTable,
-} from "database/schema.js";
-import { db } from "database/client.js";
+} from "../database/schema.js";
+import { db } from "../database/client.js";
 
 export function generateMockProduct(overrides: Partial<NewProduct> = {}): NewProduct {
   const name = overrides.name || faker.commerce.productName();
@@ -36,6 +36,10 @@ export function generateMockProduct(overrides: Partial<NewProduct> = {}): NewPro
 export async function saveMockProduct(overrides: Partial<NewProduct> = {}): Promise<Product> {
   const product = generateMockProduct(overrides);
   const result = await db.insert(productsTable).values(product).returning();
+
+  if (!result[0]) {
+    throw new Error("Failed to save product");
+  }
 
   return result[0];
 }
@@ -58,6 +62,10 @@ export async function saveMockCategory(overrides: Partial<NewCategory> = {}): Pr
   const category = generateMockCategory(overrides);
   const result = await db.insert(categoriesTable).values(category).returning();
 
+  if (!result[0]) {
+    throw new Error("Failed to save category");
+  }
+
   return result[0];
 }
 
@@ -78,6 +86,10 @@ export function generateMockCollection(overrides: Partial<NewCollection> = {}): 
 export async function saveMockCollection(overrides: Partial<NewCollection> = {}): Promise<Collection> {
   const collection = generateMockCollection(overrides);
   const result = await db.insert(collectionsTable).values(collection).returning();
+
+  if (!result[0]) {
+    throw new Error("Failed to save collection");
+  }
 
   return result[0];
 }
@@ -100,17 +112,23 @@ export async function saveMockProductImage(overrides: Partial<NewProductImage> =
   const image = generateMockProductImage(overrides);
   const result = await db.insert(productImagesTable).values(image).returning();
 
+  if (!result[0]) {
+    throw new Error("Failed to save product image");
+  }
+
   return result[0];
 }
 
 export function generateMockReview(overrides?: Partial<NewReview>): Review {
   return {
+    id: faker.number.int(),
     name: faker.person.firstName(),
     email: faker.internet.email(),
     rating: faker.number.int({ min: 1, max: 5 }),
     headline: faker.lorem.sentence(),
     content: faker.lorem.paragraph(),
     productId: 1,
+    createdAt: faker.date.recent().toISOString(),
     ...overrides,
   };
 }

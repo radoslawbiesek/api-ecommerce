@@ -1,19 +1,19 @@
 import { count, eq } from "drizzle-orm";
-import { type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
-import { DEFAULT_SKIP, DEFAULT_TAKE } from "database/common/constants.js";
-import { type ProductWithVariants, parseVariants, getOrdering } from "database/products/products.helpers.js";
+import { DEFAULT_SKIP, DEFAULT_TAKE } from "../common/constants.js";
+import { type ProductWithVariants, parseVariants, getOrdering } from "../products/products.helpers.js";
 import {
   productsTable,
   type Collection,
   type NewCollection,
   collectionsTable,
   productsToCollectionsTable,
-} from "database/schema.js";
-import { type ListParams } from "database/common/types.js";
+} from "../schema.js";
+import { type ListParams } from "../common/types.js";
+import { type Db } from "../client.js";
 
 export class CollectionsRepository {
-  constructor(private readonly db: BetterSQLite3Database) {}
+  constructor(private readonly db: Db) {}
 
   async findAll(): Promise<Collection[]> {
     return this.db.select().from(collectionsTable);
