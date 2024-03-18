@@ -216,6 +216,15 @@ export type ReviewInput = {
   email: Scalars["String"];
 };
 
+export type ProductInput = {
+  name: Scalars["String"];
+  description: Scalars["String"];
+  price: Scalars["Int"];
+  inStock: Scalars["Int"];
+  variants: Array<Scalars["String"]>;
+  categories: Array<Scalars["Int"]>;
+};
+
 export type Mutation = {
   __typename?: "Mutation";
   cartAddItem: Cart;
@@ -224,6 +233,7 @@ export type Mutation = {
   cartFindOrCreate: Cart;
   orderUpdateStatus?: Maybe<Order>;
   addReview: Review;
+  productCreate: Product;
 };
 
 export type MutationcartAddItemArgs = {
@@ -252,6 +262,26 @@ export type MutationorderUpdateStatusArgs = {
 
 export type MutationaddReviewArgs = {
   input: ReviewInput;
+};
+
+export type MutationproductCreateArgs = {
+  input: ProductInput;
+};
+
+export enum ProductCreatedEventType {
+  PRODUCT_CREATED = "PRODUCT_CREATED",
+}
+
+export type ProductCreatedEventPayload = {
+  __typename?: "ProductCreatedEventPayload";
+  productId: Scalars["Int"];
+  categories: Array<Scalars["Int"]>;
+};
+
+export type ProductCreatedEvent = {
+  __typename?: "ProductCreatedEvent";
+  topic: ProductCreatedEventType;
+  payload?: Maybe<ProductCreatedEventPayload>;
 };
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -339,7 +369,11 @@ export type ResolversTypes = {
   CardItemInput: CardItemInput;
   Review: ResolverTypeWrapper<Review>;
   ReviewInput: ReviewInput;
+  ProductInput: ProductInput;
   Mutation: ResolverTypeWrapper<{}>;
+  ProductCreatedEventType: ProductCreatedEventType;
+  ProductCreatedEventPayload: ResolverTypeWrapper<ProductCreatedEventPayload>;
+  ProductCreatedEvent: ResolverTypeWrapper<ProductCreatedEvent>;
   Boolean: ResolverTypeWrapper<Scalars["Boolean"]>;
 };
 
@@ -365,7 +399,10 @@ export type ResolversParentTypes = {
   CardItemInput: CardItemInput;
   Review: Review;
   ReviewInput: ReviewInput;
+  ProductInput: ProductInput;
   Mutation: {};
+  ProductCreatedEventPayload: ProductCreatedEventPayload;
+  ProductCreatedEvent: ProductCreatedEvent;
   Boolean: Scalars["Boolean"];
 };
 
@@ -600,6 +637,31 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationaddReviewArgs, "input">
   >;
+  productCreate?: Resolver<
+    ResolversTypes["Product"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationproductCreateArgs, "input">
+  >;
+};
+
+export type ProductCreatedEventPayloadResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends
+    ResolversParentTypes["ProductCreatedEventPayload"] = ResolversParentTypes["ProductCreatedEventPayload"],
+> = {
+  productId?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  categories?: Resolver<Array<ResolversTypes["Int"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ProductCreatedEventResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends ResolversParentTypes["ProductCreatedEvent"] = ResolversParentTypes["ProductCreatedEvent"],
+> = {
+  topic?: Resolver<ResolversTypes["ProductCreatedEventType"], ParentType, ContextType>;
+  payload?: Resolver<Maybe<ResolversTypes["ProductCreatedEventPayload"]>, ParentType, ContextType>;
+  isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = MercuriusContext> = {
@@ -619,6 +681,8 @@ export type Resolvers<ContextType = MercuriusContext> = {
   CartItem?: CartItemResolvers<ContextType>;
   Review?: ReviewResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  ProductCreatedEventPayload?: ProductCreatedEventPayloadResolvers<ContextType>;
+  ProductCreatedEvent?: ProductCreatedEventResolvers<ContextType>;
 };
 
 export type Loader<TReturn, TObj, TParams, TContext> = (
@@ -741,6 +805,16 @@ export interface Loaders<
     name?: LoaderResolver<Scalars["String"], Review, {}, TContext>;
     email?: LoaderResolver<Scalars["String"], Review, {}, TContext>;
     createdAt?: LoaderResolver<Scalars["String"], Review, {}, TContext>;
+  };
+
+  ProductCreatedEventPayload?: {
+    productId?: LoaderResolver<Scalars["Int"], ProductCreatedEventPayload, {}, TContext>;
+    categories?: LoaderResolver<Array<Scalars["Int"]>, ProductCreatedEventPayload, {}, TContext>;
+  };
+
+  ProductCreatedEvent?: {
+    topic?: LoaderResolver<ProductCreatedEventType, ProductCreatedEvent, {}, TContext>;
+    payload?: LoaderResolver<Maybe<ProductCreatedEventPayload>, ProductCreatedEvent, {}, TContext>;
   };
 }
 declare module "mercurius" {

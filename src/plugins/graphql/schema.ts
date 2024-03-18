@@ -128,17 +128,38 @@ export const schema = gql`
     email: String!
   }
 
+  input ProductInput {
+    name: String!
+    description: String!
+    price: Int!
+    inStock: Int!
+    variants: [String!]!
+    categories: [Int!]!
+  }
+
   type Mutation {
     cartAddItem(cartId: Int!, item: CardItemInput!): Cart!
-
     cartRemoveItem(cartItemId: Int!): CartItem!
-
     cartUpdateItemQuantity(cartItemId: Int!, quantity: Int!): CartItem!
-
     cartFindOrCreate(id: Int, input: CardItemInput): Cart!
-
     orderUpdateStatus(id: Int, status: String): Order
 
     addReview(input: ReviewInput!): Review!
+
+    productCreate(input: ProductInput!): Product!
+  }
+
+  enum ProductCreatedEventType {
+    PRODUCT_CREATED
+  }
+
+  type ProductCreatedEventPayload {
+    productId: Int!
+    categories: [Int!]!
+  }
+
+  type ProductCreatedEvent {
+    topic: ProductCreatedEventType!
+    payload: ProductCreatedEventPayload
   }
 `;

@@ -5,12 +5,16 @@ import { codegenMercurius } from "mercurius-codegen";
 
 import { schema } from "./schema.js";
 import { resolvers } from "./resolvers.js";
+import { PubSub } from "./pubsub.js";
 
 export const graphql: FastifyPluginAsync = async (app) => {
+  const pubSub = new PubSub();
+
   await app.register(mercurius, {
     schema,
     resolvers,
     graphiql: true,
+    subscription: { pubsub: pubSub },
   });
 
   codegenMercurius(app, {

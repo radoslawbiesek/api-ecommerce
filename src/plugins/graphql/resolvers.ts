@@ -5,6 +5,7 @@ import { CategoriesRepository } from "../../database/categories/categories.repos
 import { CollectionsRepository } from "../../database/collections/collections.repository.js";
 import { OrdersRepository } from "../../database/orders/orders.repository.js";
 import { ReviewsRepository } from "../../database/reviews/reviews.repository.js";
+import { slugify } from "../../database/products/products.helpers.js";
 
 export const resolvers: IResolvers = {
   Query: {
@@ -134,6 +135,34 @@ export const resolvers: IResolvers = {
   },
 
   Mutation: {
+    productCreate: async function productCreate(
+      _parent,
+      args: {
+        input: {
+          name: string;
+          slug?: string;
+          description: string;
+          price: number;
+          inStock: number;
+          variants: string[];
+          categories: number[];
+        };
+      },
+      context,
+    ) {
+      const productsRepository = new ProductsRepository(context.app.db);
+      const createdProduct = await productsRepository.create({
+        ...args.input,
+        slug: args.input.slug ?? slugify(args.input.name),
+      });
+      context.pubsub.publish({
+        topic: "PRODUCT_CREATED",
+        payload: { productId: createdProduct.id, categories: createdProduct.categories },
+      });
+
+      return createdProduct;
+    },
+
     cartAddItem: async function cartAddItem(
       _parent,
       args: { cartId: number; input: { productId: number; quantity: number } },

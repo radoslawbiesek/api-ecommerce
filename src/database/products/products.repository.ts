@@ -3,15 +3,19 @@ import { type SQL, and, count, eq, like, or, not, desc } from "drizzle-orm";
 import { type ListParams } from "../common/types.js";
 import { DEFAULT_SKIP, DEFAULT_TAKE } from "../common/constants.js";
 import {
-  type NewProduct,
-  type Product,
   type ProductImage,
   productImagesTable,
   productsTable,
   type NewProductImage,
+  productsToCategoriesTable,
 } from "../schema.js";
-import { parseVariants, type ProductWithVariants, getOrdering } from "../products/products.helpers.js";
 import { type Db } from "../client.js";
+import {
+  parseVariants,
+  getOrdering,
+  type ProductWithVariants,
+  type NewProductWithVariants,
+} from "./products.helpers.js";
 
 export class ProductsRepository {
   constructor(private readonly db: Db) {}
@@ -99,13 +103,49 @@ export class ProductsRepository {
     return result[0];
   }
 
-  async create(product: NewProduct): Promise<Product> {
-    const result = await this.db.insert(productsTable).values(product).returning();
+  async create({
+    categories,
+    ...product
+  }: NewProductWithVariants & { categories: number[] }): Promise<ProductWithVariants & { categories: number[] }> {
+    const result = await this.db.transaction(async (tx) => {
+      const productResult = await tx
+        .insert(productsTable)
+        .values({ ...product, variants: JSON.stringify(product.variants) })
+        .returning();
 
-    if (!result[0]) {
+      if (!productResult[0]) {
+        tx.rollback();
+        return;
+      }
+
+      const createdProduct: ProductWithVariants & { categories: number[] } = {
+        ...parseVariants(productResult[0]),
+        categories: [],
+      };
+
+      for (const categoryId of categories) {
+        const categoryResult = await tx
+          .insert(productsToCategoriesTable)
+          .values({ productId: createdProduct.id, categoryId })
+          .returning();
+
+        if (!categoryResult[0]) {
+          tx.rollback();
+          return;
+        }
+
+        if (categoryResult[0].categoryId) {
+          createdProduct.categories.push(categoryResult[0].categoryId);
+        }
+      }
+
+      return createdProduct;
+    });
+
+    if (!result) {
       throw new Error("Failed to create product");
     }
 
-    return result[0];
+    return result;
   }
 }

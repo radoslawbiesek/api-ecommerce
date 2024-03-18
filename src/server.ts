@@ -7,4 +7,4 @@ const app = Fastify({
 await app.register(import("./plugins/database/index.js"));
 await app.register(import("./plugins/graphql/index.js"));
 
-await app.listen({ port: 8000 });
+await app.listen({ port: 8000, host: "0.0.0.0" });
