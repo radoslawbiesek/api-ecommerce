@@ -63,4 +63,8 @@ export class CollectionsRepository {
 
     return result[0];
   }
+
+  async addProduct(collectionId: number, productId: number): Promise<void> {
+    await this.db.insert(productsToCollectionsTable).values({ collectionId, productId });
+  }
 }

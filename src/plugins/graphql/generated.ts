@@ -138,7 +138,6 @@ export type CollectionListItem = {
   name: Scalars["String"];
   slug: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
-  imageUrl: Scalars["String"];
 };
 
 export type Collection = {
@@ -275,7 +274,6 @@ export enum ProductCreatedEventType {
 export type ProductCreatedEventPayload = {
   __typename?: "ProductCreatedEventPayload";
   productId: Scalars["Int"];
-  categories: Array<Scalars["Int"]>;
 };
 
 export type ProductCreatedEvent = {
@@ -523,7 +521,6 @@ export type CollectionListItemResolvers<
   name?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   slug?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   description?: Resolver<Maybe<ResolversTypes["String"]>, ParentType, ContextType>;
-  imageUrl?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -651,7 +648,6 @@ export type ProductCreatedEventPayloadResolvers<
     ResolversParentTypes["ProductCreatedEventPayload"] = ResolversParentTypes["ProductCreatedEventPayload"],
 > = {
   productId?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
-  categories?: Resolver<Array<ResolversTypes["Int"]>, ParentType, ContextType>;
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -757,7 +753,6 @@ export interface Loaders<
     name?: LoaderResolver<Scalars["String"], CollectionListItem, {}, TContext>;
     slug?: LoaderResolver<Scalars["String"], CollectionListItem, {}, TContext>;
     description?: LoaderResolver<Maybe<Scalars["String"]>, CollectionListItem, {}, TContext>;
-    imageUrl?: LoaderResolver<Scalars["String"], CollectionListItem, {}, TContext>;
   };
 
   Collection?: {
@@ -809,7 +804,6 @@ export interface Loaders<
 
   ProductCreatedEventPayload?: {
     productId?: LoaderResolver<Scalars["Int"], ProductCreatedEventPayload, {}, TContext>;
-    categories?: LoaderResolver<Array<Scalars["Int"]>, ProductCreatedEventPayload, {}, TContext>;
   };
 
   ProductCreatedEvent?: {

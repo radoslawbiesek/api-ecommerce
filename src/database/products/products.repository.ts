@@ -2,13 +2,7 @@ import { type SQL, and, count, eq, like, or, not, desc } from "drizzle-orm";
 
 import { type ListParams } from "../common/types.js";
 import { DEFAULT_SKIP, DEFAULT_TAKE } from "../common/constants.js";
-import {
-  type ProductImage,
-  productImagesTable,
-  productsTable,
-  type NewProductImage,
-  productsToCategoriesTable,
-} from "../schema.js";
+import { type ProductImage, productImagesTable, productsTable, type NewProductImage } from "../schema.js";
 import { type Db } from "../client.js";
 import {
   parseVariants,
@@ -103,49 +97,16 @@ export class ProductsRepository {
     return result[0];
   }
 
-  async create({
-    categories,
-    ...product
-  }: NewProductWithVariants & { categories: number[] }): Promise<ProductWithVariants & { categories: number[] }> {
-    const result = await this.db.transaction(async (tx) => {
-      const productResult = await tx
-        .insert(productsTable)
-        .values({ ...product, variants: JSON.stringify(product.variants) })
-        .returning();
+  async create(product: NewProductWithVariants): Promise<ProductWithVariants> {
+    const result = await this.db
+      .insert(productsTable)
+      .values({ ...product, variants: JSON.stringify(product.variants) })
+      .returning();
 
-      if (!productResult[0]) {
-        tx.rollback();
-        return;
-      }
-
-      const createdProduct: ProductWithVariants & { categories: number[] } = {
-        ...parseVariants(productResult[0]),
-        categories: [],
-      };
-
-      for (const categoryId of categories) {
-        const categoryResult = await tx
-          .insert(productsToCategoriesTable)
-          .values({ productId: createdProduct.id, categoryId })
-          .returning();
-
-        if (!categoryResult[0]) {
-          tx.rollback();
-          return;
-        }
-
-        if (categoryResult[0].categoryId) {
-          createdProduct.categories.push(categoryResult[0].categoryId);
-        }
-      }
-
-      return createdProduct;
-    });
-
-    if (!result) {
+    if (!result[0]) {
       throw new Error("Failed to create product");
     }
 
-    return result;
+    return parseVariants(result[0]);
   }
 }

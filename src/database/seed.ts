@@ -1,85 +1,127 @@
 import { faker } from "@faker-js/faker";
 
-import {
-  generateMockCategory,
-  generateMockCollection,
-  generateMockProduct,
-  generateMockReview,
-} from "../tests/mock.js";
 import { db, sqlite } from "./client.js";
 import { CategoriesRepository } from "./categories/categories.repository.js";
-import { CollectionsRepository } from "./collections/collections.repository.js";
 import { ProductsRepository } from "./products/products.repository.js";
-import { productsToCategoriesTable, productsToCollectionsTable } from "./schema.js";
 import { ReviewsRepository } from "./reviews/reviews.repository.js";
+import { CollectionsRepository } from "./collections/collections.repository.js";
+
+type ProductsResponse = {
+  data: {
+    products: {
+      data: Product[];
+    };
+  };
+};
+
+type Product = {
+  name: string;
+  rating: number;
+  description: string;
+  price: number;
+  slug: string;
+  images: Image[];
+  collections: Collection[];
+  categories: Category[];
+};
+
+type Image = {
+  alt: string;
+  width: number;
+  height: number;
+  url: string;
+};
+
+type Category = {
+  name: string;
+  description: string;
+  slug: string;
+};
+
+type Collection = Category;
 
 const categoriesRepository = new CategoriesRepository(db);
-const collectionsRepository = new CollectionsRepository(db);
 const productsRepository = new ProductsRepository(db);
 const reviewsRepository = new ReviewsRepository(db);
+const collectionsRepository = new CollectionsRepository(db);
 
-const generated = new Set<string>();
-
-function generateUnique(): string {
-  const name = faker.commerce.department();
-  if (generated.has(name)) {
-    return generateUnique();
-  }
-  generated.add(name);
-
-  return name;
-}
-
-const createdCategories: number[] = [];
-for (let i = 0; i <= 2; i++) {
-  const category = await categoriesRepository.create(generateMockCategory({ name: generateUnique() }));
-  createdCategories.push(category.id);
-
-  console.log(`Created category (id: ${category.id}, name: ${category.name})`);
-}
-
-const createdCollections: number[] = [];
-for (let i = 0; i <= 3; i++) {
-  let url = "https://picsum.photos/500";
-  try {
-    const response = await fetch("https://picsum.photos/500");
-    url = response.url;
-  } catch {}
-
-  const collection = await collectionsRepository.create(
-    generateMockCollection({ name: generateUnique(), imageUrl: url }),
+async function fetchData() {
+  const response = await fetch(
+    "https://graphql.hyperfunctor.com/graphql?query=query+MyQuery+%7B%0A++products%28take%3A+50%29+%7B%0A++++data+%7B%0A++++++name%0A++++++description%0A++++++price%0A++++++slug%0A++++++images+%7B%0A++++++++alt%0A++++++++width%0A++++++++height%0A++++++++url%0A++++++%7D%0A++++++categories+%7B%0A++++++++name%0A++++++++description%0A++++++++slug%0A++++++%7D%0A++++++collections+%7B%0A++++++++name%0A++++++++description%0A++++++++slug%0A++++++%7D%0A++++%7D%0A++%7D%0A%7D#",
   );
-  createdCollections.push(collection.id);
+  if (!response.ok) {
+    throw new Error("Failed to fetch dummy data");
+  }
+  const data = await response.json();
 
-  console.log(`Created collection (id: ${collection.id}, name: ${collection.name})`);
+  return (data as ProductsResponse).data.products.data;
 }
 
-for (let i = 0; i < 40; i++) {
-  const product = await productsRepository.create(generateMockProduct({ name: faker.commerce.productName() }));
-  let productUrl = "https://picsum.photos/500";
-  try {
-    const response = await fetch("https://picsum.photos/500");
-    productUrl = response.url;
-  } catch (err) {}
+const categoriesMap = new Map<string, number>();
+async function getOrCreateCategory(category: Category): Promise<number> {
+  const existingCategory = categoriesMap.get(category.slug);
+  if (existingCategory) {
+    return existingCategory;
+  }
+  const newCategory = await categoriesRepository.create(category);
+  categoriesMap.set(category.slug, newCategory.id);
 
-  const productImage = await productsRepository.addImage(product.id, {
-    url: productUrl,
-    width: 500,
-    height: 500,
-    alt: "",
+  return newCategory.id;
+}
+
+const collectionsMap = new Map<string, number>();
+async function getOrCreateCollection(collection: Collection): Promise<number> {
+  const existingCollection = collectionsMap.get(collection.slug);
+  if (existingCollection) {
+    return existingCollection;
+  }
+  const newCollection = await collectionsRepository.create(collection);
+  collectionsMap.set(collection.slug, newCollection.id);
+
+  return newCollection.id;
+}
+
+const products = await fetchData();
+
+for await (const product of products) {
+  const variants =
+    product.categories[0]?.slug === "t-shirt" || product.categories[0]?.slug === "hoodies"
+      ? ["S", "M", "L", "XL"]
+      : ["one size"];
+
+  const newProduct = await productsRepository.create({
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    slug: product.slug,
+    variants,
   });
-  console.log(`Created product image (id: ${productImage.id}, url: ${productImage.url})`);
 
-  await db.insert(productsToCategoriesTable).values({ productId: product.id, categoryId: createdCategories[i % 3] });
-  await db
-    .insert(productsToCollectionsTable)
-    .values({ productId: product.id, collectionId: createdCollections[i % 3] });
+  for (const image of product.images) {
+    await productsRepository.addImage(newProduct.id, image);
+  }
 
-  console.log(`Created product (id: ${product.id}, name: ${product.name})`);
+  for (const category of product.categories) {
+    const categoryId = await getOrCreateCategory(category);
+    await categoriesRepository.addProduct(categoryId, newProduct.id);
+  }
 
-  for (let j = 0; j < 5; j++) {
-    const review = await reviewsRepository.create(generateMockReview({ productId: product.id }));
-    console.log(`Created review (id: ${review.id}, productId: ${review.productId})`);
+  for (const collection of product.collections) {
+    const collectionId = await getOrCreateCollection(collection);
+    await collectionsRepository.addProduct(collectionId, newProduct.id);
+  }
+
+  for (let i = 0; i < faker.number.int({ min: 0, max: 10 }); i++) {
+    const review = {
+      productId: newProduct.id,
+      name: faker.person.firstName(),
+      email: faker.internet.email(),
+      rating: faker.number.int({ min: 1, max: 5 }),
+      headline: faker.lorem.sentence(),
+      content: faker.lorem.paragraph(),
+      createdAt: faker.date.recent().toISOString(),
+    };
+    await reviewsRepository.create(review);
   }
 }
 

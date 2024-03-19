@@ -63,7 +63,6 @@ export const schema = gql`
     name: String!
     slug: String!
     description: String
-    imageUrl: String!
   }
 
   type Collection {
@@ -155,7 +154,6 @@ export const schema = gql`
 
   type ProductCreatedEventPayload {
     productId: Int!
-    categories: [Int!]!
   }
 
   type ProductCreatedEvent {

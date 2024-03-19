@@ -5,7 +5,7 @@ import { CategoriesRepository } from "../../database/categories/categories.repos
 import { CollectionsRepository } from "../../database/collections/collections.repository.js";
 import { OrdersRepository } from "../../database/orders/orders.repository.js";
 import { ReviewsRepository } from "../../database/reviews/reviews.repository.js";
-import { slugify } from "../../database/products/products.helpers.js";
+import { slugify } from "../../helpers/slugify.js";
 
 export const resolvers: IResolvers = {
   Query: {
@@ -157,7 +157,7 @@ export const resolvers: IResolvers = {
       });
       context.pubsub.publish({
         topic: "PRODUCT_CREATED",
-        payload: { productId: createdProduct.id, categories: createdProduct.categories },
+        payload: { productId: createdProduct.id },
       });
 
       return createdProduct;

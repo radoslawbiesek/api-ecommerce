@@ -41,7 +41,6 @@ export const collectionsTable = sqliteTable("collections", {
   name: text("name").notNull(),
   description: text("description"),
   slug: text("slug").notNull(),
-  imageUrl: text("image_url").notNull(),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

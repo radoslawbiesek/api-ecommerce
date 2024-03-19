@@ -73,4 +73,8 @@ export class CategoriesRepository {
 
     return result[0];
   }
+
+  async addProduct(categoryId: number, productId: number): Promise<void> {
+    await this.db.insert(productsToCategoriesTable).values({ categoryId, productId });
+  }
 }

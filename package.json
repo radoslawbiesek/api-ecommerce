@@ -12,6 +12,7 @@
     "db:migrate": "tsx --env-file=.env src/database/migrate.ts",
     "db:seed": "tsx --env-file=.env src/database/seed.ts",
     "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push:sqlite",
     "pretest": "sqlite3 test.db '' && echo .exit | sqlite3 test.db",
     "test": "node --import tsx --test --env-file=.env.test src/**/*.test.ts && rm test.db"
   },
