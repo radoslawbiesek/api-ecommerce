@@ -3,8 +3,8 @@ import { sqliteTable, integer, text, primaryKey, unique, real } from "drizzle-or
 
 export const productsTable = sqliteTable("products", {
   id: integer("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
-  slug: text("slug").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(),
   rating: real("rating"),
@@ -27,8 +27,8 @@ export const productImagesTable = sqliteTable("product_images", {
 
 export const categoriesTable = sqliteTable("categories", {
   id: integer("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
-  slug: text("slug").notNull(),
   description: text("description"),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
@@ -38,9 +38,9 @@ export const categoriesTable = sqliteTable("categories", {
 
 export const collectionsTable = sqliteTable("collections", {
   id: integer("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
   description: text("description"),
-  slug: text("slug").notNull(),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

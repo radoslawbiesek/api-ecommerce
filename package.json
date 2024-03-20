@@ -12,7 +12,8 @@
     "db:migrate": "tsx --env-file=.env src/database/migrate.ts",
     "db:seed": "tsx --env-file=.env src/database/seed.ts",
     "db:studio": "drizzle-kit studio",
-    "db:push": "drizzle-kit push:sqlite"
+    "db:push": "drizzle-kit push:sqlite",
+    "db:local": "turso dev --db-file local.db"
   },
   "keywords": [],
   "author": "",

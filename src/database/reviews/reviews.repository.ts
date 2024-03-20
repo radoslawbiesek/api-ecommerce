@@ -1,6 +1,6 @@
-import { avg, desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
-import { reviewsTable, type Review, type NewReview, productsTable } from "../schema.js";
+import { reviewsTable, type Review, type NewReview } from "../schema.js";
 import { type Db } from "../client.js";
 
 export class ReviewsRepository {
@@ -23,17 +23,9 @@ export class ReviewsRepository {
         return;
       }
 
-      const avgRating = (await this.db
-        .select({ value: avg(reviewsTable.rating).as("value") })
-        .from(reviewsTable)
-        .where(eq(reviewsTable.productId, review.productId))) as unknown as { value: number }[];
-
-      if (avgRating[0]) {
-        await this.db
-          .update(productsTable)
-          .set({ rating: avgRating[0].value })
-          .where(eq(productsTable.id, review.productId));
-      }
+      await tx.run(
+        sql`UPDATE products SET rating = (SELECT AVG(rating) FROM reviews WHERE product_id = ${review.productId}) WHERE id = ${review.productId}`,
+      );
 
       return result[0];
     });
