@@ -1,11 +1,17 @@
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
+import { migrate } from "drizzle-orm/libsql/migrator";
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
 
 import * as schema from "./schema.js";
 
-const sqlite = new Database(process.env.DATABASE_URL);
-const db = drizzle(sqlite, { schema });
+export const client = createClient({
+  url: process.env.DATABASE_URL!,
+  authToken: process.env.DATABASE_AUTH_TOKEN,
+});
+const db = drizzle(client, { schema });
 
-migrate(db, { migrationsFolder: "drizzle" });
-sqlite.close();
+migrate(db, { migrationsFolder: "drizzle" })
+  .then(() => {
+    client.close();
+  })
+  .catch(console.error);
