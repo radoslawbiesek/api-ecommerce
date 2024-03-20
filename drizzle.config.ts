@@ -1,6 +1,7 @@
 import { type Config } from "drizzle-kit";
 
 const url = process.env.DATABASE_URL;
+const authToken = process.env.DATABASE_AUTH_TOKEN;
 if (!url) {
   throw new Error("DB_URL is required");
 }
@@ -8,8 +9,9 @@ if (!url) {
 export default {
   schema: "./src/database/schema.ts",
   out: "./drizzle",
-  driver: "better-sqlite",
+  driver: "turso",
   dbCredentials: {
     url,
+    authToken,
   },
 } satisfies Config;

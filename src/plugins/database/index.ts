@@ -1,11 +1,11 @@
 import { fastifyPlugin } from "fastify-plugin";
 import { type FastifyPluginAsync } from "fastify";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { drizzle } from "drizzle-orm/libsql";
 import Database from "better-sqlite3";
 import { DefaultLogger } from "drizzle-orm";
 
 import * as schema from "../../database/schema.js";
-import { type Db } from "../../database/client.js";
+import { type Db, client } from "../../database/client.js";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -24,7 +24,7 @@ export const database: FastifyPluginAsync = async (fastify) => {
     },
   });
 
-  const db = drizzle(sqlite, { schema, logger });
+  const db = drizzle(client, { schema, logger });
 
   fastify.decorate("db", db);
   fastify.addHook("onClose", (_instance, done) => {

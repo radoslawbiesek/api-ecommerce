@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 
-import { db, sqlite } from "./client.js";
+import { db, client } from "./client.js";
 import { CategoriesRepository } from "./categories/categories.repository.js";
 import { ProductsRepository } from "./products/products.repository.js";
 import { ReviewsRepository } from "./reviews/reviews.repository.js";
@@ -125,5 +125,5 @@ for await (const product of products) {
   }
 }
 
-sqlite.close();
+client.close();
 process.exit(0);

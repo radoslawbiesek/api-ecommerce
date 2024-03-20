@@ -19,6 +19,7 @@ export const graphql: FastifyPluginAsync = async (app) => {
 
   codegenMercurius(app, {
     targetPath: "./src/plugins/graphql/generated.ts",
+    disable: process.env.NODE_ENV === "production",
   }).catch(console.error);
 };
 
