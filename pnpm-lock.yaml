@@ -5,9 +5,15 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@faker-js/faker':
+    specifier: ^8.4.1
+    version: 8.4.1
   '@libsql/client':
     specifier: ^0.5.6
     version: 0.5.6
+  '@types/better-sqlite3':
+    specifier: ^7.6.9
+    version: 7.6.9
   better-sqlite3:
     specifier: ^9.4.1
     version: 9.4.1
@@ -40,12 +46,6 @@ dependencies:
     version: 5.3.3
 
 devDependencies:
-  '@faker-js/faker':
-    specifier: ^8.4.1
-    version: 8.4.1
-  '@types/better-sqlite3':
-    specifier: ^7.6.9
-    version: 7.6.9
   '@types/node':
     specifier: ^20.11.17
     version: 20.11.17
@@ -1129,7 +1129,7 @@ packages:
   /@faker-js/faker@8.4.1:
     resolution: {integrity: sha512-XQ3cU+Q8Uqmrbf2e0cIC/QN43sTBSC8KF12u29Mb47tWrt2hAgBXSgpZMj4Ao8Uk0iJcU99QsOCaIL8934obCg==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
-    dev: true
+    dev: false
 
   /@fastify/accept-negotiator@1.1.0:
     resolution: {integrity: sha512-OIHZrb2ImZ7XG85HXOONLcJWGosv7sIvM2ifAPQVhg9Lv7qdmMBNVaai4QTdyuaqbKM5eO6sLSQOYI7wEQeCJQ==}
@@ -1614,6 +1614,7 @@ packages:
     resolution: {integrity: sha512-FvktcujPDj9XKMJQWFcl2vVl7OdRIqsSRX9b0acWwTmwLK9CF2eqo/FRcmMLNpugKoX/avA6pb7TorDLmpgTnQ==}
     dependencies:
       '@types/node': 20.11.17
+    dev: false
 
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
