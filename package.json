@@ -4,7 +4,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev": "node --import tsx --env-file=.env --watch src/server.ts",
-    "build": "rimraf dist && tsc",
+    "build": "tsc",
     "start": "node --env-file=.env dist/server.js",
     "lint": "eslint --fix",
     "format": "prettier --write .",
@@ -12,9 +12,7 @@
     "db:migrate": "tsx --env-file=.env src/database/migrate.ts",
     "db:seed": "tsx --env-file=.env src/database/seed.ts",
     "db:studio": "drizzle-kit studio",
-    "db:push": "drizzle-kit push:sqlite",
-    "pretest": "sqlite3 test.db '' && echo .exit | sqlite3 test.db",
-    "test": "node --import tsx --test --env-file=.env.test src/**/*.test.ts && rm test.db"
+    "db:push": "drizzle-kit push:sqlite"
   },
   "keywords": [],
   "author": "",
@@ -38,6 +36,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@libsql/client": "^0.5.6",
     "better-sqlite3": "^9.4.1",
     "drizzle-orm": "^0.29.3",
     "fastify": "^4.26.0",
