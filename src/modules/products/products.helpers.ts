@@ -1,6 +1,6 @@
 import { asc, desc, type SQL } from "drizzle-orm";
 
-import { type Product, type NewProduct, productsTable } from "../../database/schema.js";
+import { type Product, type NewProduct, productsTable } from "./products.schema.js";
 
 export type ProductWithVariants = Omit<Product, "variants"> & { variants: string[] };
 export type NewProductWithVariants = Omit<NewProduct, "variants"> & { variants: string[] };

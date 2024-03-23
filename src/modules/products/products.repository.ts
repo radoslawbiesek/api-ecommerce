@@ -2,8 +2,8 @@ import { type SQL, and, count, eq, like, or, not, desc } from "drizzle-orm";
 
 import { type ListParams } from "../common/types.js";
 import { DEFAULT_SKIP, DEFAULT_TAKE } from "../common/constants.js";
-import { type ProductImage, productImagesTable, productsTable, type NewProductImage } from "../../database/schema.js";
 import { type Db } from "../../database/client.js";
+import { type ProductImage, productImagesTable, productsTable, type NewProductImage } from "./products.schema.js";
 import {
   parseVariants,
   getOrdering,

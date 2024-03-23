@@ -2,15 +2,10 @@ import { count, eq } from "drizzle-orm";
 
 import { DEFAULT_SKIP, DEFAULT_TAKE } from "../common/constants.js";
 import { type ListParams } from "../common/types.js";
-import {
-  productsTable,
-  type Category,
-  type NewCategory,
-  categoriesTable,
-  productsToCategoriesTable,
-} from "../../database/schema.js";
 import { parseVariants, type ProductWithVariants, getOrdering } from "../products/products.helpers.js";
 import { type Db } from "../../database/client.js";
+import { productsTable, productsToCategoriesTable } from "../products/products.schema.js";
+import { categoriesTable, type Category, type NewCategory } from "./categories.schema.js";
 
 export class CategoriesRepository {
   constructor(private readonly db: Db) {}
