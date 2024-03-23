@@ -9,10 +9,10 @@
     "lint": "eslint --fix",
     "format": "prettier --write .",
     "db:generate-migrations": "drizzle-kit generate:sqlite",
-    "db:migrate": "tsx --env-file=.env src/database/migrate.ts",
+    "db:migrate": "npm run build && tsx --env-file=.env src/database/migrate.ts",
     "db:seed": "tsx --env-file=.env src/database/seed.ts",
     "db:studio": "drizzle-kit studio",
-    "db:push": "drizzle-kit push:sqlite",
+    "db:push": "npm run build && drizzle-kit push:sqlite",
     "db:local": "turso dev --db-file local.db"
   },
   "keywords": [],

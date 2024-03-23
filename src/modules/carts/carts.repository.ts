@@ -1,6 +1,12 @@
 import { eq, sql } from "drizzle-orm";
 
-import { type Order, ordersTable, type NewOrderItem, type OrderItem, orderItemsTable } from "../../database/schema.js";
+import {
+  type Order,
+  ordersTable,
+  type NewOrderItem,
+  type OrderItem,
+  orderItemsTable,
+} from "../orders/orders.schema.js";
 import { type Db } from "../../database/client.js";
 
 type NewCartItem = NewOrderItem;

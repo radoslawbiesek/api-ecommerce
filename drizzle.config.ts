@@ -7,7 +7,7 @@ if (!url) {
 }
 
 export default {
-  schema: "./src/database/schema.ts",
+  schema: "./dist/database/schema.js",
   out: "./drizzle",
   driver: "turso",
   dbCredentials: {

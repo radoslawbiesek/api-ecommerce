@@ -84,7 +84,7 @@ const productCreate: IFieldResolver<
     ...args.input,
     slug: args.input.slug ?? slugify(args.input.name),
   });
-  context.pubsub.publish("PRODUCT_CREATED");
+  context.pubsub.publish({ topic: "PRODUCT_CREATED", payload: null });
 
   return createdProduct;
 };
