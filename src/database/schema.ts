@@ -78,6 +78,7 @@ export const productsToCollectionsTable = sqliteTable(
 export const ordersTable = sqliteTable("orders", {
   id: integer("id").primaryKey(),
   status: text("status").notNull(),
+  userId: text("user_id"),
   createdAt: text("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

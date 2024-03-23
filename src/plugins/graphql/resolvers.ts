@@ -5,6 +5,7 @@ import { CategoriesRepository } from "../../database/categories/categories.repos
 import { CollectionsRepository } from "../../database/collections/collections.repository.js";
 import { OrdersRepository } from "../../database/orders/orders.repository.js";
 import { ReviewsRepository } from "../../database/reviews/reviews.repository.js";
+import { CartsRepository } from "../../database/carts/carts.repository.js";
 import { slugify } from "../../helpers/slugify.js";
 
 export const resolvers: IResolvers = {
@@ -68,15 +69,27 @@ export const resolvers: IResolvers = {
     },
 
     cart: async function cart(_parent, args: { id: number }, context) {
-      const ordersRepository = new OrdersRepository(context.app.db);
+      const cartsRepository = new CartsRepository(context.app.db);
 
-      return ordersRepository.findById(args.id);
+      return cartsRepository.findById(args.id);
     },
 
     reviews: async function reviews(_parent, args: { productId: number }, context) {
       const reviewsRepository = new ReviewsRepository(context.app.db);
 
       return reviewsRepository.findAll(args.productId);
+    },
+
+    async orders(parent, args: { userId: string }, context) {
+      const ordersRepository = new OrdersRepository(context.app.db);
+
+      return ordersRepository.findAll(args.userId);
+    },
+
+    async order(parent, args: { id: number; userId: string }, context) {
+      const ordersRepository = new OrdersRepository(context.app.db);
+
+      return ordersRepository.findById(args.id);
     },
   },
 
@@ -168,15 +181,15 @@ export const resolvers: IResolvers = {
       args: { cartId: number; input: { productId: number; quantity: number } },
       context,
     ) {
-      const ordersRepository = new OrdersRepository(context.app.db);
+      const cartsRepository = new CartsRepository(context.app.db);
 
-      return ordersRepository.addItem({ ...args.input, orderId: args.cartId });
+      return cartsRepository.addItem({ ...args.input, orderId: args.cartId });
     },
 
     cartRemoveItem: async function cartRemoveItem(_parent, args: { cartItemId: number }, context) {
-      const ordersRepository = new OrdersRepository(context.app.db);
+      const cartsRepository = new CartsRepository(context.app.db);
 
-      return ordersRepository.deleteItem(args.cartItemId);
+      return cartsRepository.deleteItem(args.cartItemId);
     },
 
     cartUpdateItemQuantity: async function cartUpdateItemQuantity(
@@ -184,9 +197,9 @@ export const resolvers: IResolvers = {
       args: { cartItemId: number; quantity: number },
       context,
     ) {
-      const ordersRepository = new OrdersRepository(context.app.db);
+      const cartsRepository = new CartsRepository(context.app.db);
 
-      return ordersRepository.updateItem({ id: args.cartItemId, quantity: args.quantity });
+      return cartsRepository.updateItem({ id: args.cartItemId, quantity: args.quantity });
     },
 
     cartFindOrCreate: async function cartFindOrCreate(
@@ -194,25 +207,29 @@ export const resolvers: IResolvers = {
       args: { id: number; input?: { productId: number; quantity: number } },
       context,
     ) {
-      const ordersRepository = new OrdersRepository(context.app.db);
+      const cartsRepository = new CartsRepository(context.app.db);
 
-      let cart = await ordersRepository.findById(args.id);
+      let cart = await cartsRepository.findById(args.id);
       if (!cart) {
-        cart = await ordersRepository.create();
+        cart = await cartsRepository.create();
       }
 
       if (args.input) {
-        const item = await ordersRepository.addItem({ ...args.input, orderId: cart.id });
+        const item = await cartsRepository.addItem({ ...args.input, orderId: cart.id });
         cart.items.push(item);
       }
 
       return cart;
     },
 
-    orderUpdateStatus: async function orderUpdateStatus(_parent, args: { id: number; status: string }, context) {
+    orderUpdate: async function orderUpdateStatus(
+      _parent,
+      args: { id: number; input: { status: string; userId: string } },
+      context,
+    ) {
       const ordersRepository = new OrdersRepository(context.app.db);
 
-      return ordersRepository.update(args.id, { status: args.status });
+      return ordersRepository.update(args.id, { status: args.input.status, userId: args.input.userId });
     },
 
     addReview: async function addReview(

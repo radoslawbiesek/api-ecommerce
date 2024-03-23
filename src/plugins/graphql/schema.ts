@@ -11,6 +11,8 @@ export const schema = gql`
     collections: Collections
     cart(id: Int!): Cart
     reviews(productId: Int!): [Review!]!
+    orders(userId: String!): [OrderListItem!]!
+    order(id: Int!, userId: String!): Order
   }
 
   type Product {
@@ -85,13 +87,7 @@ export const schema = gql`
     id: Int!
     items: [CartItem!]!
   }
-
-  type Order {
-    id: Int!
-    items: [CartItem!]!
-    status: String
-  }
-
+  
   type CartItem {
     id: Int!
     quantity: Int!
@@ -105,6 +101,21 @@ export const schema = gql`
     productId: Int!
     quantity: Int!
     variant: String!
+  }
+
+  type OrderListItem {
+    id: Int!
+    userId: String
+    status: String
+    createdAt: String
+  }
+  
+  type Order {
+    id: Int!
+    userId: String
+    status: String
+    createdAt: String
+    items: [CartItem!]!
   }
 
   type Review {
@@ -136,12 +147,18 @@ export const schema = gql`
     categories: [Int!]!
   }
 
+  input OrderUpdateInput {
+    status: String!
+    userId: String!
+  }
+
   type Mutation {
     cartAddItem(cartId: Int!, item: CardItemInput!): Cart!
     cartRemoveItem(cartItemId: Int!): CartItem!
     cartUpdateItemQuantity(cartItemId: Int!, quantity: Int!): CartItem!
     cartFindOrCreate(id: Int, input: CardItemInput): Cart!
-    orderUpdateStatus(id: Int, status: String): Order
+
+    orderUpdate(id: Int, input: OrderUpdateInput): Order
 
     addReview(input: ReviewInput!): Review!
 
