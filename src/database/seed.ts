@@ -1,10 +1,10 @@
 import { faker } from "@faker-js/faker";
 
+import { CategoriesRepository } from "../modules/categories/categories.repository.js";
+import { ProductsRepository } from "../modules/products/products.repository.js";
+import { ReviewsRepository } from "../modules/reviews/reviews.repository.js";
+import { CollectionsRepository } from "../modules/collections/collections.repository.js";
 import { db, client } from "./client.js";
-import { CategoriesRepository } from "./categories/categories.repository.js";
-import { ProductsRepository } from "./products/products.repository.js";
-import { ReviewsRepository } from "./reviews/reviews.repository.js";
-import { CollectionsRepository } from "./collections/collections.repository.js";
 
 type ProductsResponse = {
   data: {

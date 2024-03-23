@@ -8,9 +8,9 @@ import {
   type NewCategory,
   categoriesTable,
   productsToCategoriesTable,
-} from "../schema.js";
+} from "../../database/schema.js";
 import { parseVariants, type ProductWithVariants, getOrdering } from "../products/products.helpers.js";
-import { type Db } from "../client.js";
+import { type Db } from "../../database/client.js";
 
 export class CategoriesRepository {
   constructor(private readonly db: Db) {}

@@ -8,9 +8,9 @@ import {
   type NewCollection,
   collectionsTable,
   productsToCollectionsTable,
-} from "../schema.js";
+} from "../../database/schema.js";
 import { type ListParams } from "../common/types.js";
-import { type Db } from "../client.js";
+import { type Db } from "../../database/client.js";
 
 export class CollectionsRepository {
   constructor(private readonly db: Db) {}

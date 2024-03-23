@@ -8,13 +8,11 @@ import { resolvers } from "./resolvers.js";
 import { PubSub } from "./pubsub.js";
 
 export const graphql: FastifyPluginAsync = async (app) => {
-  const pubSub = new PubSub();
-
   await app.register(mercurius, {
     schema,
     resolvers,
     graphiql: true,
-    subscription: { pubsub: pubSub },
+    subscription: { pubsub: new PubSub() },
   });
 
   codegenMercurius(app, {

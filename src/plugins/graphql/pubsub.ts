@@ -15,7 +15,7 @@ export class PubSub {
     this.webhookSecret = process.env.WEBHOOK_SECRET;
   }
 
-  async #sendEvent(event: { topic: string; payload: unknown }, retriesLeft = this.MAX_RETRIES): Promise<void> {
+  async #sendEvent(event: string, retriesLeft = this.MAX_RETRIES): Promise<void> {
     if (retriesLeft <= 0) {
       return;
     }
@@ -34,7 +34,7 @@ export class PubSub {
     }
   }
 
-  publish(event: { topic: string; payload: unknown }): void {
+  publish(event: string): void {
     void this.#sendEvent(event);
   }
 }

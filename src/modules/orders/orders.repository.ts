@@ -1,7 +1,7 @@
 import { eq, ne, and } from "drizzle-orm";
 
-import { type Order, ordersTable, type OrderItem, orderItemsTable } from "../schema.js";
-import { type Db } from "../client.js";
+import { type Order, ordersTable, type OrderItem, orderItemsTable } from "../../database/schema.js";
+import { type Db } from "../../database/client.js";
 
 type OrderWithItems = Order & { items: OrderItem[] };
 

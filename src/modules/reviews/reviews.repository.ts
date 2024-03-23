@@ -1,7 +1,7 @@
 import { desc, eq, sql } from "drizzle-orm";
 
-import { reviewsTable, type Review, type NewReview } from "../schema.js";
-import { type Db } from "../client.js";
+import { reviewsTable, type Review, type NewReview } from "../../database/schema.js";
+import { type Db } from "../../database/client.js";
 
 export class ReviewsRepository {
   constructor(private readonly db: Db) {}
