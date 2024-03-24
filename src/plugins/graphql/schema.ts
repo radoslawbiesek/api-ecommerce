@@ -87,7 +87,7 @@ export const schema = gql`
     id: Int!
     items: [CartItem!]!
   }
-  
+
   type CartItem {
     id: Int!
     quantity: Int!
@@ -109,7 +109,7 @@ export const schema = gql`
     status: String
     createdAt: String
   }
-  
+
   type Order {
     id: Int!
     userId: String
@@ -163,18 +163,5 @@ export const schema = gql`
     addReview(input: ReviewInput!): Review!
 
     productCreate(input: ProductInput!): Product!
-  }
-
-  enum ProductCreatedEventType {
-    PRODUCT_CREATED
-  }
-
-  type ProductCreatedEventPayload {
-    productId: Int!
-  }
-
-  type ProductCreatedEvent {
-    topic: ProductCreatedEventType!
-    payload: ProductCreatedEventPayload
   }
 `;

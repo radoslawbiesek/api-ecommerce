@@ -1,4 +1,4 @@
-import { asc, desc, type SQL } from "drizzle-orm";
+import { asc, desc, sql, type SQL } from "drizzle-orm";
 
 import { type Product, type NewProduct, productsTable } from "./products.schema.js";
 
@@ -12,9 +12,9 @@ export function getOrdering(ordering?: string): SQL {
     case "price":
       return asc(productsTable.price);
     case "-rating":
-      return desc(productsTable.rating);
+      return sql`rating DESC NULLS LAST`;
     case "rating":
-      return asc(productsTable.rating);
+      return sql`rating ASC NULLS LAST`;
     case "name":
       return asc(productsTable.name);
     case "-name":
