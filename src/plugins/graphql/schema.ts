@@ -15,6 +15,19 @@ export const schema = gql`
     order(id: Int!, userId: String!): Order
   }
 
+  type Mutation {
+    cartAddItem(cartId: Int!, item: CardItemInput!): Cart!
+    cartRemoveItem(cartItemId: Int!): CartItem!
+    cartUpdateItemQuantity(cartItemId: Int!, quantity: Int!): CartItem!
+    cartFindOrCreate(id: Int, input: CardItemInput): Cart!
+
+    orderUpdate(id: Int, input: OrderUpdateInput): Order
+
+    addReview(input: ReviewInput!): Review!
+
+    productCreate(input: ProductInput!): Product!
+  }
+
   type Product {
     id: Int!
     name: String!
@@ -150,18 +163,5 @@ export const schema = gql`
   input OrderUpdateInput {
     status: String!
     userId: String!
-  }
-
-  type Mutation {
-    cartAddItem(cartId: Int!, item: CardItemInput!): Cart!
-    cartRemoveItem(cartItemId: Int!): CartItem!
-    cartUpdateItemQuantity(cartItemId: Int!, quantity: Int!): CartItem!
-    cartFindOrCreate(id: Int, input: CardItemInput): Cart!
-
-    orderUpdate(id: Int, input: OrderUpdateInput): Order
-
-    addReview(input: ReviewInput!): Review!
-
-    productCreate(input: ProductInput!): Product!
   }
 `;

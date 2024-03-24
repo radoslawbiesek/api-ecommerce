@@ -38,6 +38,7 @@
     "fastify-tsconfig": "^2.0.0",
     "graphql": "^16.8.1",
     "mercurius": "^13.3.3",
+    "mercurius-cache": "^6.0.1",
     "mercurius-codegen": "^5.0.4",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.3"

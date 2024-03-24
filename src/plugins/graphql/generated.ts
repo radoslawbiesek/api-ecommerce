@@ -88,6 +88,49 @@ export type QueryorderArgs = {
   userId: Scalars["String"];
 };
 
+export type Mutation = {
+  __typename?: "Mutation";
+  cartAddItem: Cart;
+  cartRemoveItem: CartItem;
+  cartUpdateItemQuantity: CartItem;
+  cartFindOrCreate: Cart;
+  orderUpdate?: Maybe<Order>;
+  addReview: Review;
+  productCreate: Product;
+};
+
+export type MutationcartAddItemArgs = {
+  cartId: Scalars["Int"];
+  item: CardItemInput;
+};
+
+export type MutationcartRemoveItemArgs = {
+  cartItemId: Scalars["Int"];
+};
+
+export type MutationcartUpdateItemQuantityArgs = {
+  cartItemId: Scalars["Int"];
+  quantity: Scalars["Int"];
+};
+
+export type MutationcartFindOrCreateArgs = {
+  id?: InputMaybe<Scalars["Int"]>;
+  input?: InputMaybe<CardItemInput>;
+};
+
+export type MutationorderUpdateArgs = {
+  id?: InputMaybe<Scalars["Int"]>;
+  input?: InputMaybe<OrderUpdateInput>;
+};
+
+export type MutationaddReviewArgs = {
+  input: ReviewInput;
+};
+
+export type MutationproductCreateArgs = {
+  input: ProductInput;
+};
+
 export type Product = {
   __typename?: "Product";
   id: Scalars["Int"];
@@ -252,49 +295,6 @@ export type OrderUpdateInput = {
   userId: Scalars["String"];
 };
 
-export type Mutation = {
-  __typename?: "Mutation";
-  cartAddItem: Cart;
-  cartRemoveItem: CartItem;
-  cartUpdateItemQuantity: CartItem;
-  cartFindOrCreate: Cart;
-  orderUpdate?: Maybe<Order>;
-  addReview: Review;
-  productCreate: Product;
-};
-
-export type MutationcartAddItemArgs = {
-  cartId: Scalars["Int"];
-  item: CardItemInput;
-};
-
-export type MutationcartRemoveItemArgs = {
-  cartItemId: Scalars["Int"];
-};
-
-export type MutationcartUpdateItemQuantityArgs = {
-  cartItemId: Scalars["Int"];
-  quantity: Scalars["Int"];
-};
-
-export type MutationcartFindOrCreateArgs = {
-  id?: InputMaybe<Scalars["Int"]>;
-  input?: InputMaybe<CardItemInput>;
-};
-
-export type MutationorderUpdateArgs = {
-  id?: InputMaybe<Scalars["Int"]>;
-  input?: InputMaybe<OrderUpdateInput>;
-};
-
-export type MutationaddReviewArgs = {
-  input: ReviewInput;
-};
-
-export type MutationproductCreateArgs = {
-  input: ProductInput;
-};
-
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
@@ -398,6 +398,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars["String"]>;
   Int: ResolverTypeWrapper<Scalars["Int"]>;
+  Mutation: ResolverTypeWrapper<{}>;
   Product: ResolverTypeWrapper<Product>;
   Float: ResolverTypeWrapper<Scalars["Float"]>;
   Image: ResolverTypeWrapper<Image>;
@@ -418,7 +419,6 @@ export type ResolversTypes = {
   ReviewInput: ReviewInput;
   ProductInput: ProductInput;
   OrderUpdateInput: OrderUpdateInput;
-  Mutation: ResolverTypeWrapper<{}>;
   Boolean: ResolverTypeWrapper<Scalars["Boolean"]>;
 };
 
@@ -427,6 +427,7 @@ export type ResolversParentTypes = {
   Query: {};
   String: Scalars["String"];
   Int: Scalars["Int"];
+  Mutation: {};
   Product: Product;
   Float: Scalars["Float"];
   Image: Image;
@@ -447,7 +448,6 @@ export type ResolversParentTypes = {
   ReviewInput: ReviewInput;
   ProductInput: ProductInput;
   OrderUpdateInput: OrderUpdateInput;
-  Mutation: {};
   Boolean: Scalars["Boolean"];
 };
 
@@ -519,6 +519,55 @@ export type QueryResolvers<
     ParentType,
     ContextType,
     RequireFields<QueryorderArgs, "id" | "userId">
+  >;
+};
+
+export type MutationResolvers<
+  ContextType = MercuriusContext,
+  ParentType extends
+    ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"],
+> = {
+  cartAddItem?: Resolver<
+    ResolversTypes["Cart"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationcartAddItemArgs, "cartId" | "item">
+  >;
+  cartRemoveItem?: Resolver<
+    ResolversTypes["CartItem"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationcartRemoveItemArgs, "cartItemId">
+  >;
+  cartUpdateItemQuantity?: Resolver<
+    ResolversTypes["CartItem"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationcartUpdateItemQuantityArgs, "cartItemId" | "quantity">
+  >;
+  cartFindOrCreate?: Resolver<
+    ResolversTypes["Cart"],
+    ParentType,
+    ContextType,
+    Partial<MutationcartFindOrCreateArgs>
+  >;
+  orderUpdate?: Resolver<
+    Maybe<ResolversTypes["Order"]>,
+    ParentType,
+    ContextType,
+    Partial<MutationorderUpdateArgs>
+  >;
+  addReview?: Resolver<
+    ResolversTypes["Review"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationaddReviewArgs, "input">
+  >;
+  productCreate?: Resolver<
+    ResolversTypes["Product"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationproductCreateArgs, "input">
   >;
 };
 
@@ -751,57 +800,9 @@ export type ReviewResolvers<
   isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type MutationResolvers<
-  ContextType = MercuriusContext,
-  ParentType extends
-    ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"],
-> = {
-  cartAddItem?: Resolver<
-    ResolversTypes["Cart"],
-    ParentType,
-    ContextType,
-    RequireFields<MutationcartAddItemArgs, "cartId" | "item">
-  >;
-  cartRemoveItem?: Resolver<
-    ResolversTypes["CartItem"],
-    ParentType,
-    ContextType,
-    RequireFields<MutationcartRemoveItemArgs, "cartItemId">
-  >;
-  cartUpdateItemQuantity?: Resolver<
-    ResolversTypes["CartItem"],
-    ParentType,
-    ContextType,
-    RequireFields<MutationcartUpdateItemQuantityArgs, "cartItemId" | "quantity">
-  >;
-  cartFindOrCreate?: Resolver<
-    ResolversTypes["Cart"],
-    ParentType,
-    ContextType,
-    Partial<MutationcartFindOrCreateArgs>
-  >;
-  orderUpdate?: Resolver<
-    Maybe<ResolversTypes["Order"]>,
-    ParentType,
-    ContextType,
-    Partial<MutationorderUpdateArgs>
-  >;
-  addReview?: Resolver<
-    ResolversTypes["Review"],
-    ParentType,
-    ContextType,
-    RequireFields<MutationaddReviewArgs, "input">
-  >;
-  productCreate?: Resolver<
-    ResolversTypes["Product"],
-    ParentType,
-    ContextType,
-    RequireFields<MutationproductCreateArgs, "input">
-  >;
-};
-
 export type Resolvers<ContextType = MercuriusContext> = {
   Query?: QueryResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
   Product?: ProductResolvers<ContextType>;
   Image?: ImageResolvers<ContextType>;
   Products?: ProductsResolvers<ContextType>;
@@ -817,7 +818,6 @@ export type Resolvers<ContextType = MercuriusContext> = {
   OrderListItem?: OrderListItemResolvers<ContextType>;
   Order?: OrderResolvers<ContextType>;
   Review?: ReviewResolvers<ContextType>;
-  Mutation?: MutationResolvers<ContextType>;
 };
 
 export type Loader<TReturn, TObj, TParams, TContext> = (
