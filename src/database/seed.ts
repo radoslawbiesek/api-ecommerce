@@ -111,7 +111,7 @@ for await (const product of products) {
     await collectionsRepository.addProduct(collectionId, newProduct.id);
   }
 
-  for (let i = 0; i < faker.number.int({ min: 0, max: 10 }); i++) {
+  for (let i = 0; i < faker.number.int({ min: 1, max: 10 }); i++) {
     const review = {
       productId: newProduct.id,
       name: faker.person.firstName(),
